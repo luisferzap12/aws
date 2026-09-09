@@ -1,5 +1,5 @@
 /* Service worker generado por generar_app.py — no editar a mano. */
-const CACHE = "repaso-clf-c02-202609081952";
+const CACHE = "repaso-clf-c02-202609090245";
 const ARCHIVOS = ["./", "./index.html", "./manifest.json", "./icono-192.png", "./icono-512.png"];
 
 self.addEventListener("install", (e) => {
