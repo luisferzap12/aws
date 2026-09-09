@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F5F6F4">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Repaso AWS</title>
+
+<style>
+:root{
+  --papel:#F5F6F4;
+  --tinta:#17222B;
+  --tenue:#5B7C99;
+  --linea:#C9CEC9;
+  --vpc:#3F6EA6;
+  --acento:#E8873A;
+  --ok:#2E7D5B;
+  --ok-fondo:#EAF3EA;
+  --err:#B23B3B;
+  --err-fondo:#F8EBEB;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"Roboto Mono","SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--papel);
+  color:var(--tinta);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.5;
+  -webkit-text-size-adjust:100%;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.app{max-width:640px;margin:0 auto;padding:0 16px}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--vpc);outline-offset:2px}
+.oculto{display:none !important}
+
+/* ---------- barra superior ---------- */
+.barra{
+  position:sticky;top:0;z-index:20;background:var(--papel);
+  display:flex;align-items:center;gap:12px;
+  padding:14px 0 10px;border-bottom:1px solid var(--linea);
+}
+.barra .volver{
+  background:none;border:none;padding:4px 6px 4px 0;font-size:20px;line-height:1;color:var(--tenue);
+}
+.barra .titulo{font-size:15px;font-weight:600;flex:1;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.barra .contador{font-family:var(--mono);font-size:13px;color:var(--tenue);white-space:nowrap}
+.progreso{height:3px;background:var(--linea);position:sticky;top:52px;z-index:19}
+.progreso i{display:block;height:100%;background:var(--vpc);width:0;transition:width .25s ease}
+
+/* ---------- portada ---------- */
+.portada{padding:28px 0 40px}
+.sello{
+  font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--vpc);
+  border:1px solid var(--vpc);border-radius:4px;padding:3px 8px;display:inline-block;
+}
+.portada h1{font-size:30px;line-height:1.15;margin:16px 0 6px;font-weight:650;letter-spacing:-.02em}
+.portada p.sub{color:var(--tenue);margin:0 0 26px;max-width:44ch}
+
+.bloque{margin-bottom:26px}
+.bloque > h2{font-size:14px;font-weight:600;margin:0 0 10px;color:var(--tenue)}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  border:1.5px solid var(--linea);background:#fff;border-radius:999px;
+  padding:9px 14px;font-size:14px;
+}
+.chip[aria-pressed="true"]{border-color:var(--vpc);background:#E9EFF7;color:#1D4A78;font-weight:600}
+.chip .n{font-family:var(--mono);font-size:12px;color:var(--tenue);margin-left:6px}
+.chip[aria-pressed="true"] .n{color:#1D4A78}
+
+.modos{display:grid;gap:10px}
+.modo{
+  display:block;width:100%;text-align:left;background:#fff;
+  border:1.5px solid var(--linea);border-radius:8px;padding:14px 16px;
+}
+.modo[aria-pressed="true"]{border-color:var(--acento);background:#FDF1E7}
+.modo b{display:block;font-size:16px;font-weight:600;margin-bottom:2px}
+.modo span{font-size:13.5px;color:var(--tenue)}
+
+.deslizador{display:flex;align-items:center;gap:14px}
+.deslizador input{flex:1;accent-color:var(--vpc)}
+.deslizador output{font-family:var(--mono);font-size:15px;min-width:2.5ch;text-align:right}
+
+.principal{
+  width:100%;border:none;border-radius:8px;background:var(--vpc);color:#fff;
+  font-size:17px;font-weight:600;padding:16px;margin-top:6px;
+}
+.principal:disabled{background:var(--linea);color:#7C8A80}
+.secundario{
+  width:100%;border:1.5px solid var(--linea);border-radius:8px;background:#fff;
+  font-size:15px;padding:13px;margin-top:10px;
+}
+.nota{font-size:13px;color:var(--tenue);margin-top:14px}
+
+/* ---------- pregunta ---------- */
+.pregunta{padding:18px 0 130px}
+.etiqueta-dominio{
+  font-family:var(--mono);font-size:11.5px;color:var(--tenue);
+  text-transform:none;margin-bottom:10px;display:block;
+}
+.enunciado{font-size:19px;line-height:1.38;margin:0 0 8px;font-weight:500;letter-spacing:-.01em}
+.aviso-multiple{font-size:13.5px;color:var(--acento);font-weight:600;margin:0 0 14px}
+
+.marco-diagrama{
+  border:1.5px dashed var(--vpc);border-radius:8px;background:#fff;
+  padding:8px;margin:0 0 18px;position:relative;
+}
+.marco-diagrama img{display:block;width:100%;height:auto;border-radius:4px}
+.marco-diagrama .lupa{
+  position:absolute;right:14px;bottom:14px;background:rgba(23,34,43,.82);color:#fff;
+  border:none;border-radius:999px;font-size:12.5px;padding:7px 12px;
+}
+
+.opciones{display:grid;gap:10px;margin:0 0 18px}
+.opcion{
+  display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;
+  background:#fff;border:1.5px solid var(--linea);border-radius:8px;
+  padding:14px;min-height:56px;font-size:15.5px;line-height:1.4;
+}
+.opcion .letra{
+  flex:0 0 auto;width:26px;height:26px;border-radius:6px;border:1.5px solid var(--linea);
+  display:grid;place-items:center;font-family:var(--mono);font-size:13px;color:var(--tenue);
+}
+.opcion[aria-pressed="true"]{border-color:var(--vpc);background:#E9EFF7}
+.opcion[aria-pressed="true"] .letra{border-color:var(--vpc);background:var(--vpc);color:#fff}
+.opcion[data-estado="ok"]{border-color:var(--ok);background:var(--ok-fondo)}
+.opcion[data-estado="ok"] .letra{border-color:var(--ok);background:var(--ok);color:#fff}
+.opcion[data-estado="mal"]{border-color:var(--err);background:var(--err-fondo)}
+.opcion[data-estado="mal"] .letra{border-color:var(--err);background:var(--err);color:#fff}
+.opcion[disabled]{cursor:default;opacity:1}
+
+.explicacion{
+  border-left:3px solid var(--ok);background:#fff;border-radius:0 8px 8px 0;
+  padding:14px 16px;margin-bottom:18px;
+}
+.explicacion.fallo{border-left-color:var(--err)}
+.explicacion .veredicto{font-weight:650;font-size:15px;margin:0 0 6px}
+.explicacion p{margin:0;font-size:15px;line-height:1.5}
+.explicacion .ref{
+  font-family:var(--mono);font-size:12px;color:var(--tenue);margin-top:10px;display:block;
+}
+
+.pie{
+  position:fixed;left:0;right:0;bottom:0;z-index:25;
+  background:linear-gradient(to top,var(--papel) 72%,rgba(245,246,244,0));
+  padding:14px 16px calc(16px + env(safe-area-inset-bottom));
+}
+.pie .app{padding:0}
+.reloj{
+  font-family:var(--mono);font-size:13px;color:var(--tenue);
+  text-align:center;margin-bottom:8px;
+}
+.reloj.urgente{color:var(--err);font-weight:600}
+
+/* ---------- visor de diagrama ---------- */
+.visor{
+  position:fixed;inset:0;z-index:60;background:#0E161D;display:flex;flex-direction:column;
+}
+.visor .lienzo{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:12px;display:grid;place-items:start center}
+.visor img{background:#fff;border-radius:6px;display:block;transform-origin:top center}
+.visor .controles{
+  display:flex;gap:8px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+  background:#0E161D;border-top:1px solid #24343F;
+}
+.visor .controles button{
+  flex:1;background:#1B2932;border:1px solid #33474F;color:#E7EDF2;
+  border-radius:8px;padding:13px;font-size:15px;
+}
+
+/* ---------- resultados ---------- */
+.resultado{padding:26px 0 60px}
+.marcador{text-align:center;margin-bottom:8px}
+.marcador .cifra{font-size:60px;font-weight:650;line-height:1;letter-spacing:-.03em}
+.marcador .cifra small{font-size:24px;font-weight:500;color:var(--tenue)}
+.marcador .frase{color:var(--tenue);margin-top:8px;font-size:15px}
+.umbral{
+  font-family:var(--mono);font-size:12.5px;color:var(--tenue);
+  text-align:center;border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  padding:10px 0;margin:22px 0 26px;
+}
+.dominio{margin-bottom:16px}
+.dominio .fila{display:flex;justify-content:space-between;font-size:14.5px;margin-bottom:6px}
+.dominio .fila span:last-child{font-family:var(--mono);color:var(--tenue)}
+.riel{height:9px;background:#E4E7E3;border-radius:999px;overflow:hidden}
+.riel i{display:block;height:100%;background:var(--vpc);border-radius:999px}
+.riel i.bajo{background:var(--err)}
+.riel i.alto{background:var(--ok)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+</style>
+</head>
+<body>
+
+<!-- ===================== PORTADA ===================== -->
+<section id="pantalla-inicio">
+  <div class="app portada">
+    <span class="sello" id="sello-cert">SAA-C03</span>
+    <h1 id="titulo-cert">AWS Solutions Architect</h1>
+    <p class="sub" id="desc-cert"></p>
+
+    <div class="bloque">
+      <h2>Dominios que quieres repasar</h2>
+      <div class="chips" id="chips-dominios"></div>
+    </div>
+
+    <div class="bloque">
+      <h2>Cómo quieres practicar</h2>
+      <div class="modos">
+        <button class="modo" data-modo="estudio" aria-pressed="true">
+          <b>Estudio</b>
+          <span>Corriges pregunta por pregunta y lees la explicación al momento.</span>
+        </button>
+        <button class="modo" data-modo="examen" aria-pressed="false">
+          <b>Examen cronometrado</b>
+          <span>Dos minutos por pregunta, sin pistas. Las explicaciones llegan al final.</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="bloque">
+      <h2>Cuántas preguntas</h2>
+      <div class="deslizador">
+        <input type="range" id="cuantas" min="5" max="16" step="1" value="10" aria-label="Número de preguntas">
+        <output id="cuantas-valor">10</output>
+      </div>
+    </div>
+
+    <button class="principal" id="btn-empezar">Empezar</button>
+    <button class="secundario oculto" id="btn-falladas">Repasar las que fallé</button>
+    <p class="nota" id="nota-historial"></p>
+  </div>
+</section>
+
+<!-- ===================== PREGUNTA ===================== -->
+<section id="pantalla-pregunta" class="oculto">
+  <div class="app">
+    <div class="barra">
+      <button class="volver" id="btn-salir" aria-label="Salir de la sesión">←</button>
+      <span class="titulo" id="titulo-sesion"></span>
+      <span class="contador" id="contador"></span>
+    </div>
+  </div>
+  <div class="progreso"><i id="barra-progreso"></i></div>
+
+  <div class="app pregunta">
+    <span class="etiqueta-dominio" id="etiqueta-dominio"></span>
+    <h2 class="enunciado" id="enunciado"></h2>
+    <p class="aviso-multiple oculto" id="aviso-multiple">Selecciona dos respuestas</p>
+
+    <div class="marco-diagrama oculto" id="marco-diagrama">
+      <img id="diagrama" alt="Diagrama de arquitectura de la pregunta">
+      <button class="lupa" id="btn-ampliar">Ampliar</button>
+    </div>
+
+    <div class="opciones" id="opciones"></div>
+    <div id="zona-explicacion"></div>
+  </div>
+
+  <div class="pie">
+    <div class="app">
+      <div class="reloj oculto" id="reloj"></div>
+      <button class="principal" id="btn-accion" disabled>Comprobar</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== RESULTADOS ===================== -->
+<section id="pantalla-resultado" class="oculto">
+  <div class="app">
+    <div class="barra">
+      <button class="volver" id="btn-inicio" aria-label="Volver al inicio">←</button>
+      <span class="titulo">Resultado de la sesión</span>
+    </div>
+  </div>
+  <div class="app resultado">
+    <div class="marcador">
+      <div class="cifra" id="cifra-puntaje">0<small>%</small></div>
+      <div class="frase" id="frase-puntaje"></div>
+    </div>
+    <div class="umbral" id="umbral"></div>
+    <div id="desglose-dominios"></div>
+    <button class="principal" id="btn-revisar">Revisar las respuestas</button>
+    <button class="secundario" id="btn-otra">Otra sesión</button>
+  </div>
+</section>
+
+<!-- ===================== VISOR ===================== -->
+<div class="visor oculto" id="visor">
+  <div class="lienzo" id="lienzo-visor"><img id="img-visor" alt="Diagrama ampliado"></div>
+  <div class="controles">
+    <button id="zoom-menos" aria-label="Reducir">−</button>
+    <button id="zoom-ajustar">Ajustar</button>
+    <button id="zoom-mas" aria-label="Ampliar">+</button>
+    <button id="cerrar-visor">Cerrar</button>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* Los datos del banco los inyecta generar_app.py */
+const BANCO = {"certificacion":"CLF-C02","titulo":"AWS Cloud Practitioner","descripcion":"Repaso del curso Cloud Practitioner Essentials, con el reparto de dominios del examen real.","umbral":70,"dominios":[{"id":"conceptos","nombre":"Conceptos de la nube","peso":24},{"id":"seguridad","nombre":"Seguridad y cumplimiento","peso":30},{"id":"tecnologia","nombre":"Tecnología y servicios","peso":34},{"id":"facturacion","nombre":"Facturación, precios y soporte","peso":12}],"preguntas":[{"id":"con-01","dominio":"conceptos","enunciado":"Una empresa migra de su propio centro de datos a AWS. ¿Qué cambio describe mejor el efecto sobre sus gastos?","opciones":["Pasa de gasto variable a gasto de capital anticipado","Pasa de gasto de capital anticipado a gasto variable según el consumo","Elimina por completo cualquier gasto en tecnología","Convierte los gastos operativos en inversión en hardware"],"correctas":[1],"explicacion":"Antes había que comprar servidores por adelantado sin saber cuánto se usarían: eso es gasto de capital. En la nube pagas por lo que consumes, cuando lo consumes. Es una de las ventajas que el examen repite con distintas palabras.","referencia":"Conceptos · Beneficios de la nube"},{"id":"con-02","dominio":"conceptos","enunciado":"AWS puede ofrecer precios más bajos que los que conseguiría una empresa comprando su propio hardware. ¿A qué beneficio corresponde?","opciones":["Economías de escala masivas","Alta disponibilidad","Tolerancia a fallos","Elasticidad"],"correctas":[0],"explicacion":"AWS agrega el consumo de cientos de miles de clientes, compra a un volumen enorme y traslada parte de ese ahorro al precio. Es un beneficio económico, no técnico.","referencia":"Conceptos · Economías de escala"},{"id":"con-03","dominio":"conceptos","enunciado":"Un equipo necesitaba semanas para conseguir servidores de prueba y ahora los lanza en minutos. ¿Qué beneficio de la nube ilustra el caso?","opciones":["Agilidad y velocidad de aprovisionamiento","Cumplimiento normativo","Economías de escala","Facturación consolidada"],"correctas":[0],"explicacion":"Reducir el tiempo entre la idea y el recurso funcionando es agilidad. Permite experimentar barato: si la prueba falla, apagas los recursos y dejas de pagar.","referencia":"Conceptos · Agilidad"},{"id":"con-04","dominio":"conceptos","enunciado":"¿Qué describe la elasticidad en AWS?","opciones":["Distribuir la aplicación en varias zonas de disponibilidad","Añadir y quitar capacidad automáticamente según la demanda del momento","Cifrar los datos en reposo y en tránsito","Guardar copias de seguridad en otra región"],"correctas":[1],"explicacion":"La elasticidad es el ajuste automático en ambas direcciones: crece en el pico y se reduce cuando baja la demanda, para que dejes de pagar capacidad ociosa. No confundir con alta disponibilidad, que es seguir funcionando ante un fallo.","referencia":"Conceptos · Elasticidad"},{"id":"con-05","dominio":"conceptos","enunciado":"¿Cuál de estos NO es un pilar del AWS Well-Architected Framework?","opciones":["Excelencia operativa","Eficiencia del rendimiento","Sostenibilidad","Portabilidad entre proveedores"],"correctas":[3],"explicacion":"Los seis pilares son excelencia operativa, seguridad, fiabilidad, eficiencia del rendimiento, optimización de costos y sostenibilidad. La portabilidad entre proveedores no está entre ellos.","referencia":"Well-Architected Framework"},{"id":"con-06","dominio":"conceptos","enunciado":"Una empresa mantiene su sistema contable en su propio centro de datos y ejecuta el sitio web en AWS, conectados entre sí. ¿Qué modelo de despliegue es?","opciones":["Nube pública","Nube híbrida","Local (on-premises)","Multinube"],"correctas":[1],"explicacion":"Combinar recursos en la nube con infraestructura propia conectada es un despliegue híbrido. Es habitual cuando una parte del sistema no se puede mover por normativa o por ser demasiado antigua.","referencia":"Conceptos · Modelos de despliegue"},{"id":"con-07","dominio":"conceptos","enunciado":"Amazon EC2, donde tú eliges el sistema operativo, lo parchas y administras la instancia, ¿a qué modelo de servicio corresponde?","opciones":["Infraestructura como servicio (IaaS)","Plataforma como servicio (PaaS)","Software como servicio (SaaS)","Función como servicio"],"correctas":[0],"explicacion":"IaaS entrega los bloques básicos de cómputo, red y almacenamiento, y el control del sistema operativo queda en tus manos. Si AWS gestionara el sistema operativo y solo desplegaras código, sería PaaS.","referencia":"Conceptos · Modelos de servicio"},{"id":"con-08","dominio":"conceptos","enunciado":"¿Qué principios de diseño en la nube recomienda AWS? Selecciona dos.","opciones":["Diseñar asumiendo que los componentes van a fallar","Desacoplar los componentes para que no dependan unos de otros","Concentrar toda la carga en una instancia grande para simplificar","Estimar la capacidad máxima al inicio y fijarla para todo el año"],"correctas":[0,1],"explicacion":"Diseñar para el fallo y desacoplar son dos principios centrales. Los otros dos son justamente los hábitos del centro de datos tradicional que la nube busca eliminar: escalar verticalmente sin límite y adivinar la capacidad por adelantado.","referencia":"Conceptos · Principios de diseño"},{"id":"con-09","dominio":"conceptos","enunciado":"Una startup quiere que su aplicación responda rápido a usuarios de Europa y Asia sin construir centros de datos allí. ¿Qué beneficio de la nube aprovecha?","opciones":["Alcance global en minutos","Facturación consolidada","Responsabilidad compartida","Reserva de capacidad a tres años"],"correctas":[0],"explicacion":"Desplegar en regiones cercanas al usuario, o distribuir contenido por las ubicaciones de borde, se hace en minutos y sin inversión previa. Es la ventaja de alcance global que el examen menciona como \"volverse global en minutos\".","referencia":"Conceptos · Alcance global"},{"id":"con-10","dominio":"conceptos","enunciado":"¿Qué significa que en la nube dejas de \"adivinar la capacidad\"?","opciones":["Que AWS decide automáticamente el presupuesto del proyecto","Que puedes ajustar los recursos hacia arriba o hacia abajo cuando cambie la demanda real","Que los recursos son gratuitos hasta cierto límite","Que ya no hace falta monitorear el rendimiento"],"correctas":[1],"explicacion":"En un centro de datos propio compras hardware basándote en una predicción: si te quedas corto, el servicio se degrada; si te pasas, pagaste de más. En la nube ajustas después, con datos reales de uso.","referencia":"Conceptos · Beneficios de la nube"},{"id":"seg-01","dominio":"seguridad","enunciado":"Según el modelo de responsabilidad compartida del diagrama, ¿quién debe instalar los parches del sistema operativo de una instancia EC2?","imagen":"responsabilidad-compartida.svg","opciones":["AWS, como parte de la seguridad de la nube","El cliente, como parte de la seguridad en la nube","El proveedor del sistema operativo directamente","Nadie: las instancias EC2 se actualizan solas"],"correctas":[1],"explicacion":"En EC2 el sistema operativo invitado es del cliente: tú lo eliges, lo configuras y lo parchas. AWS parchea el hipervisor y la infraestructura que hay debajo, no lo que corre dentro de tu instancia.","referencia":"Modelo de responsabilidad compartida","imagen_datos":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjAgNDcwIiBmb250LWZhbWlseT0iU2Vnb2UgVUksIFJvYm90bywgSGVsdmV0aWNhLCBBcmlhbCwgc2Fucy1zZXJpZiI+CiAgPHJlY3Qgd2lkdGg9IjcyMCIgaGVpZ2h0PSI0NzAiIGZpbGw9IiNmZmZmZmYiLz4KCiAgPCEtLSBDbGllbnRlIC0tPgogIDxyZWN0IHg9IjIwIiB5PSIyMCIgd2lkdGg9IjMzNiIgaGVpZ2h0PSI0MzAiIHJ4PSI4IiBmaWxsPSIjRkRGMUU3IiBzdHJva2U9IiNFODg3M0EiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjE4OCIgeT0iNTAiIGZvbnQtc2l6ZT0iMTciIGZvbnQtd2VpZ2h0PSI2NTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5NjU0MUIiPkNsaWVudGU8L3RleHQ+CiAgPHRleHQgeD0iMTg4IiB5PSI3MiIgZm9udC1zaXplPSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzk2NTQxQiI+c2VndXJpZGFkIEVOIGxhIG51YmU8L3RleHQ+CgogIDxyZWN0IHg9IjQyIiB5PSI5MiIgd2lkdGg9IjI5MiIgaGVpZ2h0PSI1MiIgcng9IjYiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iI0U4ODczQSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8dGV4dCB4PSIxODgiIHk9IjEyNCIgZm9udC1zaXplPSIxNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MjIyQiI+RGF0b3MgZGVsIGNsaWVudGU8L3RleHQ+CgogIDxyZWN0IHg9IjQyIiB5PSIxNTYiIHdpZHRoPSIyOTIiIGhlaWdodD0iNTIiIHJ4PSI2IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiNFODg3M0EiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iMTg4IiB5PSIxODEiIGZvbnQtc2l6ZT0iMTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzIyMkIiPkFwbGljYWNpb25lcyBlIGlkZW50aWRhZGVzPC90ZXh0PgogIDx0ZXh0IHg9IjE4OCIgeT0iMTk5IiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNUI3Qzk5Ij51c3Vhcmlvcywgcm9sZXMgeSBwZXJtaXNvcyBJQU08L3RleHQ+CgogIDxyZWN0IHg9IjQyIiB5PSIyMjAiIHdpZHRoPSIyOTIiIGhlaWdodD0iNTIiIHJ4PSI2IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiNFODg3M0EiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iMTg4IiB5PSIyNDUiIGZvbnQtc2l6ZT0iMTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzIyMkIiPlNpc3RlbWEgb3BlcmF0aXZvIGludml0YWRvPC90ZXh0PgogIDx0ZXh0IHg9IjE4OCIgeT0iMjYzIiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNUI3Qzk5Ij5wYXJjaGVzIHkgY29uZmlndXJhY2nDs248L3RleHQ+CgogIDxyZWN0IHg9IjQyIiB5PSIyODQiIHdpZHRoPSIyOTIiIGhlaWdodD0iNTIiIHJ4PSI2IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiNFODg3M0EiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iMTg4IiB5PSIzMDkiIGZvbnQtc2l6ZT0iMTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzIyMkIiPkNvbmZpZ3VyYWNpw7NuIGRlIHJlZDwvdGV4dD4KICA8dGV4dCB4PSIxODgiIHk9IjMyNyIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+Z3J1cG9zIGRlIHNlZ3VyaWRhZCB5IGZpcmV3YWxsPC90ZXh0PgoKICA8cmVjdCB4PSI0MiIgeT0iMzQ4IiB3aWR0aD0iMjkyIiBoZWlnaHQ9IjUyIiByeD0iNiIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjRTg4NzNBIiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDx0ZXh0IHg9IjE4OCIgeT0iMzczIiBmb250LXNpemU9IjE1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyMjJCIj5DaWZyYWRvIGRlIGxvcyBkYXRvczwvdGV4dD4KICA8dGV4dCB4PSIxODgiIHk9IjM5MSIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+ZW4gcmVwb3NvIHkgZW4gdHLDoW5zaXRvPC90ZXh0PgoKICA8IS0tIExpbmVhIGRpdmlzb3JpYSAtLT4KICA8bGluZSB4MT0iMzY0IiB5MT0iMjAiIHgyPSIzNjQiIHkyPSI0NTAiIHN0cm9rZT0iI0M5Q0VDOSIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjYgNSIvPgoKICA8IS0tIEFXUyAtLT4KICA8cmVjdCB4PSIzNzIiIHk9IjIwIiB3aWR0aD0iMzI4IiBoZWlnaHQ9IjQzMCIgcng9IjgiIGZpbGw9IiNFOUVGRjciIHN0cm9rZT0iIzNGNkVBNiIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iNTM2IiB5PSI1MCIgZm9udC1zaXplPSIxNyIgZm9udC13ZWlnaHQ9IjY1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFENEE3OCI+QVdTPC90ZXh0PgogIDx0ZXh0IHg9IjUzNiIgeT0iNzIiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxRDRBNzgiPnNlZ3VyaWRhZCBERSBsYSBudWJlPC90ZXh0PgoKICA8cmVjdCB4PSIzOTQiIHk9IjkyIiB3aWR0aD0iMjg0IiBoZWlnaHQ9IjUyIiByeD0iNiIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjM0Y2RUE2IiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDx0ZXh0IHg9IjUzNiIgeT0iMTI0IiBmb250LXNpemU9IjE1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyMjJCIj5Tb2Z0d2FyZSBkZSBsb3Mgc2VydmljaW9zPC90ZXh0PgoKICA8cmVjdCB4PSIzOTQiIHk9IjE1NiIgd2lkdGg9IjI4NCIgaGVpZ2h0PSI1MiIgcng9IjYiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzNGNkVBNiIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8dGV4dCB4PSI1MzYiIHk9IjE4MSIgZm9udC1zaXplPSIxNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MjIyQiI+Q8OzbXB1dG8sIGFsbWFjZW5hbWllbnRvPC90ZXh0PgogIDx0ZXh0IHg9IjUzNiIgeT0iMTk5IiBmb250LXNpemU9IjE1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyMjJCIj5iYXNlcyBkZSBkYXRvcyB5IHJlZDwvdGV4dD4KCiAgPHJlY3QgeD0iMzk0IiB5PSIyMjAiIHdpZHRoPSIyODQiIGhlaWdodD0iNTIiIHJ4PSI2IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiMzRjZFQTYiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNTM2IiB5PSIyNDUiIGZvbnQtc2l6ZT0iMTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzIyMkIiPlZpcnR1YWxpemFjacOzbiBlIGhpcGVydmlzb3I8L3RleHQ+CiAgPHRleHQgeD0iNTM2IiB5PSIyNjMiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM1QjdDOTkiPnkgc3UgcGFyY2hlbzwvdGV4dD4KCiAgPHJlY3QgeD0iMzk0IiB5PSIyODQiIHdpZHRoPSIyODQiIGhlaWdodD0iNTIiIHJ4PSI2IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiMzRjZFQTYiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNTM2IiB5PSIzMTYiIGZvbnQtc2l6ZT0iMTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzIyMkIiPkhhcmR3YXJlIHkgcmVkIGbDrXNpY2E8L3RleHQ+CgogIDxyZWN0IHg9IjM5NCIgeT0iMzQ4IiB3aWR0aD0iMjg0IiBoZWlnaHQ9IjUyIiByeD0iNiIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjM0Y2RUE2IiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDx0ZXh0IHg9IjUzNiIgeT0iMzczIiBmb250LXNpemU9IjE1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyMjJCIj5SZWdpb25lcywgem9uYXMgZGU8L3RleHQ+CiAgPHRleHQgeD0iNTM2IiB5PSIzOTEiIGZvbnQtc2l6ZT0iMTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzIyMkIiPmRpc3BvbmliaWxpZGFkIHkgYm9yZGVzPC90ZXh0PgoKICA8dGV4dCB4PSIxODgiIHk9IjQyOCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzk2NTQxQiI+bG8gcXVlIHTDuiBjb25maWd1cmFzPC90ZXh0PgogIDx0ZXh0IHg9IjUzNiIgeT0iNDI4IiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMUQ0QTc4Ij5sbyBxdWUgQVdTIG9wZXJhIHBvciB0aTwvdGV4dD4KPC9zdmc+Cg=="},{"id":"seg-02","dominio":"seguridad","enunciado":"¿De cuál de estas tareas se encarga AWS según el modelo de responsabilidad compartida?","imagen":"responsabilidad-compartida.svg","opciones":["Configurar los grupos de seguridad de tus instancias","Definir los permisos de los usuarios IAM","Proteger físicamente los centros de datos","Clasificar y cifrar los datos de tu aplicación"],"correctas":[2],"explicacion":"La seguridad física de las instalaciones, el hardware y la red física es responsabilidad exclusiva de AWS, y ni siquiera puedes acceder a ella. Todo lo que se configura desde la consola o la API es tuyo.","referencia":"Modelo de responsabilidad compartida","imagen_datos":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjAgNDcwIiBmb250LWZhbWlseT0iU2Vnb2UgVUksIFJvYm90bywgSGVsdmV0aWNhLCBBcmlhbCwgc2Fucy1zZXJpZiI+CiAgPHJlY3Qgd2lkdGg9IjcyMCIgaGVpZ2h0PSI0NzAiIGZpbGw9IiNmZmZmZmYiLz4KCiAgPCEtLSBDbGllbnRlIC0tPgogIDxyZWN0IHg9IjIwIiB5PSIyMCIgd2lkdGg9IjMzNiIgaGVpZ2h0PSI0MzAiIHJ4PSI4IiBmaWxsPSIjRkRGMUU3IiBzdHJva2U9IiNFODg3M0EiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjE4OCIgeT0iNTAiIGZvbnQtc2l6ZT0iMTciIGZvbnQtd2VpZ2h0PSI2NTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5NjU0MUIiPkNsaWVudGU8L3RleHQ+CiAgPHRleHQgeD0iMTg4IiB5PSI3MiIgZm9udC1zaXplPSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzk2NTQxQiI+c2VndXJpZGFkIEVOIGxhIG51YmU8L3RleHQ+CgogIDxyZWN0IHg9IjQyIiB5PSI5MiIgd2lkdGg9IjI5MiIgaGVpZ2h0PSI1MiIgcng9IjYiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iI0U4ODczQSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8dGV4dCB4PSIxODgiIHk9IjEyNCIgZm9udC1zaXplPSIxNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MjIyQiI+RGF0b3MgZGVsIGNsaWVudGU8L3RleHQ+CgogIDxyZWN0IHg9IjQyIiB5PSIxNTYiIHdpZHRoPSIyOTIiIGhlaWdodD0iNTIiIHJ4PSI2IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiNFODg3M0EiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iMTg4IiB5PSIxODEiIGZvbnQtc2l6ZT0iMTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzIyMkIiPkFwbGljYWNpb25lcyBlIGlkZW50aWRhZGVzPC90ZXh0PgogIDx0ZXh0IHg9IjE4OCIgeT0iMTk5IiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNUI3Qzk5Ij51c3Vhcmlvcywgcm9sZXMgeSBwZXJtaXNvcyBJQU08L3RleHQ+CgogIDxyZWN0IHg9IjQyIiB5PSIyMjAiIHdpZHRoPSIyOTIiIGhlaWdodD0iNTIiIHJ4PSI2IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiNFODg3M0EiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iMTg4IiB5PSIyNDUiIGZvbnQtc2l6ZT0iMTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzIyMkIiPlNpc3RlbWEgb3BlcmF0aXZvIGludml0YWRvPC90ZXh0PgogIDx0ZXh0IHg9IjE4OCIgeT0iMjYzIiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNUI3Qzk5Ij5wYXJjaGVzIHkgY29uZmlndXJhY2nDs248L3RleHQ+CgogIDxyZWN0IHg9IjQyIiB5PSIyODQiIHdpZHRoPSIyOTIiIGhlaWdodD0iNTIiIHJ4PSI2IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiNFODg3M0EiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iMTg4IiB5PSIzMDkiIGZvbnQtc2l6ZT0iMTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzIyMkIiPkNvbmZpZ3VyYWNpw7NuIGRlIHJlZDwvdGV4dD4KICA8dGV4dCB4PSIxODgiIHk9IjMyNyIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+Z3J1cG9zIGRlIHNlZ3VyaWRhZCB5IGZpcmV3YWxsPC90ZXh0PgoKICA8cmVjdCB4PSI0MiIgeT0iMzQ4IiB3aWR0aD0iMjkyIiBoZWlnaHQ9IjUyIiByeD0iNiIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjRTg4NzNBIiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDx0ZXh0IHg9IjE4OCIgeT0iMzczIiBmb250LXNpemU9IjE1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyMjJCIj5DaWZyYWRvIGRlIGxvcyBkYXRvczwvdGV4dD4KICA8dGV4dCB4PSIxODgiIHk9IjM5MSIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+ZW4gcmVwb3NvIHkgZW4gdHLDoW5zaXRvPC90ZXh0PgoKICA8IS0tIExpbmVhIGRpdmlzb3JpYSAtLT4KICA8bGluZSB4MT0iMzY0IiB5MT0iMjAiIHgyPSIzNjQiIHkyPSI0NTAiIHN0cm9rZT0iI0M5Q0VDOSIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjYgNSIvPgoKICA8IS0tIEFXUyAtLT4KICA8cmVjdCB4PSIzNzIiIHk9IjIwIiB3aWR0aD0iMzI4IiBoZWlnaHQ9IjQzMCIgcng9IjgiIGZpbGw9IiNFOUVGRjciIHN0cm9rZT0iIzNGNkVBNiIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iNTM2IiB5PSI1MCIgZm9udC1zaXplPSIxNyIgZm9udC13ZWlnaHQ9IjY1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFENEE3OCI+QVdTPC90ZXh0PgogIDx0ZXh0IHg9IjUzNiIgeT0iNzIiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxRDRBNzgiPnNlZ3VyaWRhZCBERSBsYSBudWJlPC90ZXh0PgoKICA8cmVjdCB4PSIzOTQiIHk9IjkyIiB3aWR0aD0iMjg0IiBoZWlnaHQ9IjUyIiByeD0iNiIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjM0Y2RUE2IiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDx0ZXh0IHg9IjUzNiIgeT0iMTI0IiBmb250LXNpemU9IjE1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyMjJCIj5Tb2Z0d2FyZSBkZSBsb3Mgc2VydmljaW9zPC90ZXh0PgoKICA8cmVjdCB4PSIzOTQiIHk9IjE1NiIgd2lkdGg9IjI4NCIgaGVpZ2h0PSI1MiIgcng9IjYiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzNGNkVBNiIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8dGV4dCB4PSI1MzYiIHk9IjE4MSIgZm9udC1zaXplPSIxNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MjIyQiI+Q8OzbXB1dG8sIGFsbWFjZW5hbWllbnRvPC90ZXh0PgogIDx0ZXh0IHg9IjUzNiIgeT0iMTk5IiBmb250LXNpemU9IjE1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyMjJCIj5iYXNlcyBkZSBkYXRvcyB5IHJlZDwvdGV4dD4KCiAgPHJlY3QgeD0iMzk0IiB5PSIyMjAiIHdpZHRoPSIyODQiIGhlaWdodD0iNTIiIHJ4PSI2IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiMzRjZFQTYiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNTM2IiB5PSIyNDUiIGZvbnQtc2l6ZT0iMTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzIyMkIiPlZpcnR1YWxpemFjacOzbiBlIGhpcGVydmlzb3I8L3RleHQ+CiAgPHRleHQgeD0iNTM2IiB5PSIyNjMiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM1QjdDOTkiPnkgc3UgcGFyY2hlbzwvdGV4dD4KCiAgPHJlY3QgeD0iMzk0IiB5PSIyODQiIHdpZHRoPSIyODQiIGhlaWdodD0iNTIiIHJ4PSI2IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiMzRjZFQTYiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNTM2IiB5PSIzMTYiIGZvbnQtc2l6ZT0iMTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzIyMkIiPkhhcmR3YXJlIHkgcmVkIGbDrXNpY2E8L3RleHQ+CgogIDxyZWN0IHg9IjM5NCIgeT0iMzQ4IiB3aWR0aD0iMjg0IiBoZWlnaHQ9IjUyIiByeD0iNiIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjM0Y2RUE2IiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDx0ZXh0IHg9IjUzNiIgeT0iMzczIiBmb250LXNpemU9IjE1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyMjJCIj5SZWdpb25lcywgem9uYXMgZGU8L3RleHQ+CiAgPHRleHQgeD0iNTM2IiB5PSIzOTEiIGZvbnQtc2l6ZT0iMTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzIyMkIiPmRpc3BvbmliaWxpZGFkIHkgYm9yZGVzPC90ZXh0PgoKICA8dGV4dCB4PSIxODgiIHk9IjQyOCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzk2NTQxQiI+bG8gcXVlIHTDuiBjb25maWd1cmFzPC90ZXh0PgogIDx0ZXh0IHg9IjUzNiIgeT0iNDI4IiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMUQ0QTc4Ij5sbyBxdWUgQVdTIG9wZXJhIHBvciB0aTwvdGV4dD4KPC9zdmc+Cg=="},{"id":"seg-03","dominio":"seguridad","enunciado":"Al usar Amazon RDS en lugar de instalar la base de datos en EC2, ¿qué responsabilidad se traslada a AWS?","opciones":["Los parches del sistema operativo subyacente y del motor de base de datos","La creación de los usuarios de la base de datos","El cifrado que decides aplicar a tus datos","Las reglas del grupo de seguridad que controla el acceso"],"correctas":[0],"explicacion":"Cuanto más gestionado es el servicio, más tareas asume AWS. Con RDS deja de ser tuyo el mantenimiento del sistema operativo y del motor, pero sigues decidiendo quién se conecta, con qué permisos y con qué cifrado.","referencia":"Responsabilidad compartida · Servicios gestionados"},{"id":"seg-04","dominio":"seguridad","enunciado":"¿Cuál es la práctica recomendada respecto al usuario raíz de una cuenta AWS?","opciones":["Usarlo a diario porque tiene todos los permisos necesarios","Compartir sus credenciales con el equipo de operaciones","Activarle MFA, guardar sus credenciales y trabajar con usuarios o roles IAM","Eliminarlo después de crear el primer usuario IAM"],"correctas":[2],"explicacion":"El usuario raíz no se puede eliminar ni limitar con políticas, así que se protege con autenticación multifactor y se reserva para las pocas tareas que solo él puede hacer. El trabajo diario va con identidades de permisos acotados.","referencia":"IAM · Usuario raíz"},{"id":"seg-05","dominio":"seguridad","enunciado":"Otorgar a cada identidad únicamente los permisos que necesita para su tarea, y nada más, se conoce como:","opciones":["Autenticación multifactor","Principio de mínimo privilegio","Responsabilidad compartida","Federación de identidades"],"correctas":[1],"explicacion":"Es el principio base de IAM. Se empieza sin permisos y se van agregando los estrictamente necesarios, en vez de dar acceso amplio y recortar después.","referencia":"IAM · Mínimo privilegio"},{"id":"seg-06","dominio":"seguridad","enunciado":"Una aplicación que corre en EC2 necesita acceder a un bucket de S3. ¿Cuál es la forma recomendada?","opciones":["Crear un usuario IAM y copiar sus claves de acceso a la instancia","Asignar un rol IAM a la instancia","Hacer público el bucket","Usar las credenciales del usuario raíz"],"correctas":[1],"explicacion":"Los roles entregan credenciales temporales que se renuevan solas, así no hay claves guardadas en el servidor que alguien pueda robar. Es el patrón que el examen espera siempre que un servicio de AWS deba hablar con otro.","referencia":"IAM · Roles"},{"id":"seg-07","dominio":"seguridad","enunciado":"Entran diez personas nuevas al equipo de desarrollo y todas necesitan los mismos permisos. ¿Cuál es la forma más eficiente de gestionarlo en IAM?","opciones":["Adjuntar la política a cada usuario por separado","Crear un grupo IAM con la política y agregar a los diez usuarios","Compartir un único usuario entre los diez","Darles acceso con el usuario raíz y revocarlo cada noche"],"correctas":[1],"explicacion":"El grupo IAM existe para eso: la política se mantiene en un solo lugar y todos los miembros la heredan. Compartir un usuario, además, impide saber quién hizo cada acción.","referencia":"IAM · Grupos"},{"id":"seg-08","dominio":"seguridad","enunciado":"¿Qué servicio protege las aplicaciones frente a ataques de denegación de servicio distribuido?","opciones":["AWS Shield","Amazon Inspector","AWS Artifact","AWS Config"],"correctas":[0],"explicacion":"Shield Standard se aplica sin costo adicional a todos los clientes. Shield Advanced es de pago y agrega protección ante ataques mayores, métricas detalladas y acceso a un equipo de respuesta.","referencia":"AWS Shield"},{"id":"seg-09","dominio":"seguridad","enunciado":"El equipo quiere filtrar solicitudes web maliciosas, como intentos de inyección SQL, antes de que lleguen a la aplicación. ¿Qué servicio usa?","opciones":["AWS WAF","Amazon GuardDuty","AWS KMS","Amazon Macie"],"correctas":[0],"explicacion":"AWS WAF es un firewall de aplicaciones web: inspecciona las solicitudes HTTP y bloquea las que coinciden con reglas que tú defines. GuardDuty detecta actividad sospechosa, pero no filtra tráfico.","referencia":"AWS WAF"},{"id":"seg-10","dominio":"seguridad","enunciado":"¿Qué servicio analiza de forma continua registros y actividad de la cuenta para detectar comportamiento malicioso o no autorizado?","opciones":["Amazon GuardDuty","AWS Trusted Advisor","AWS Artifact","Amazon CloudFront"],"correctas":[0],"explicacion":"GuardDuty es el servicio de detección de amenazas: revisa fuentes como los registros de CloudTrail y de flujo de VPC y genera hallazgos. No requiere instalar agentes.","referencia":"Amazon GuardDuty"},{"id":"seg-11","dominio":"seguridad","enunciado":"Una auditora pide los informes de cumplimiento de AWS, como SOC 2 e ISO 27001. ¿Dónde se descargan?","opciones":["AWS Artifact","AWS Config","AWS Trusted Advisor","Amazon Inspector"],"correctas":[0],"explicacion":"AWS Artifact es el repositorio de informes de auditoría y acuerdos de AWS, disponible bajo demanda desde la consola. Es una pregunta casi textual en el examen.","referencia":"AWS Artifact"},{"id":"seg-12","dominio":"seguridad","enunciado":"¿Cuáles de estas tareas son responsabilidad del cliente? Selecciona dos.","opciones":["Configurar la autenticación multifactor de los usuarios","Retirar y destruir físicamente los discos dados de baja","Definir las reglas de los grupos de seguridad","Mantener la energía y la refrigeración de los centros de datos"],"correctas":[0,2],"explicacion":"Las identidades y la configuración de red son del cliente. La destrucción de medios y las instalaciones físicas son de AWS: si la tarea implica tocar hardware, no es tuya.","referencia":"Modelo de responsabilidad compartida"},{"id":"tec-01","dominio":"tecnologia","enunciado":"Según el diagrama, ¿qué es una zona de disponibilidad?","imagen":"regiones-az.svg","opciones":["Un único servidor dentro de una región","Uno o varios centros de datos aislados dentro de una región","Una copia completa de una región en otro continente","Un punto de caché para contenido estático"],"correctas":[1],"explicacion":"Cada zona de disponibilidad agrupa uno o más centros de datos con energía y red independientes, y está lo bastante lejos de las demás como para que un desastre local no las tumbe a todas, pero lo bastante cerca para replicar con baja latencia.","referencia":"Infraestructura global · Zonas de disponibilidad","imagen_datos":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjAgNDUwIiBmb250LWZhbWlseT0iU2Vnb2UgVUksIFJvYm90bywgSGVsdmV0aWNhLCBBcmlhbCwgc2Fucy1zZXJpZiI+CiAgPHJlY3Qgd2lkdGg9IjcyMCIgaGVpZ2h0PSI0NTAiIGZpbGw9IiNmZmZmZmYiLz4KCiAgPCEtLSBSZWdpb24gLS0+CiAgPHJlY3QgeD0iMjAiIHk9IjIwIiB3aWR0aD0iNDg0IiBoZWlnaHQ9IjQxMCIgcng9IjEwIiBmaWxsPSIjRjdGOUZCIiBzdHJva2U9IiMzRjZFQTYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNyA1Ii8+CiAgPHRleHQgeD0iNDIiIHk9IjQ4IiBmb250LXNpemU9IjE3IiBmb250LXdlaWdodD0iNjUwIiBmaWxsPSIjM0Y2RUE2Ij5SZWdpw7NuPC90ZXh0PgogIDx0ZXh0IHg9IjQyIiB5PSI3MCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzVCN0M5OSI+ZWplbXBsbzogc2EtZWFzdC0xIChTw6NvIFBhdWxvKTwvdGV4dD4KCiAgPCEtLSBBWiAxIC0tPgogIDxyZWN0IHg9IjQ0IiB5PSI5MCIgd2lkdGg9IjQzNiIgaGVpZ2h0PSI5OCIgcng9IjgiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzVCN0M5OSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iNjQiIHk9IjExOCIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzE3MjIyQiI+Wm9uYSBkZSBkaXNwb25pYmlsaWRhZCBBPC90ZXh0PgogIDxyZWN0IHg9IjY0IiB5PSIxMzAiIHdpZHRoPSIxMjAiIGhlaWdodD0iNDAiIHJ4PSI1IiBmaWxsPSIjRUFGM0VBIiBzdHJva2U9IiMyRTdENUIiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iMTI0IiB5PSIxNTUiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxRjVCNDEiPmNlbnRybyBkZSBkYXRvczwvdGV4dD4KICA8cmVjdCB4PSIxOTYiIHk9IjEzMCIgd2lkdGg9IjEyMCIgaGVpZ2h0PSI0MCIgcng9IjUiIGZpbGw9IiNFQUYzRUEiIHN0cm9rZT0iIzJFN0Q1QiIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8dGV4dCB4PSIyNTYiIHk9IjE1NSIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFGNUI0MSI+Y2VudHJvIGRlIGRhdG9zPC90ZXh0PgoKICA8IS0tIEFaIDIgLS0+CiAgPHJlY3QgeD0iNDQiIHk9IjIwMiIgd2lkdGg9IjQzNiIgaGVpZ2h0PSI5OCIgcng9IjgiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzVCN0M5OSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iNjQiIHk9IjIzMCIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzE3MjIyQiI+Wm9uYSBkZSBkaXNwb25pYmlsaWRhZCBCPC90ZXh0PgogIDxyZWN0IHg9IjY0IiB5PSIyNDIiIHdpZHRoPSIxMjAiIGhlaWdodD0iNDAiIHJ4PSI1IiBmaWxsPSIjRUFGM0VBIiBzdHJva2U9IiMyRTdENUIiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iMTI0IiB5PSIyNjciIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxRjVCNDEiPmNlbnRybyBkZSBkYXRvczwvdGV4dD4KCiAgPCEtLSBBWiAzIC0tPgogIDxyZWN0IHg9IjQ0IiB5PSIzMTQiIHdpZHRoPSI0MzYiIGhlaWdodD0iOTgiIHJ4PSI4IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiM1QjdDOTkiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjY0IiB5PSIzNDIiIGZvbnQtc2l6ZT0iMTUiIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiMxNzIyMkIiPlpvbmEgZGUgZGlzcG9uaWJpbGlkYWQgQzwvdGV4dD4KICA8cmVjdCB4PSI2NCIgeT0iMzU0IiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjQwIiByeD0iNSIgZmlsbD0iI0VBRjNFQSIgc3Ryb2tlPSIjMkU3RDVCIiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDx0ZXh0IHg9IjEyNCIgeT0iMzc5IiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMUY1QjQxIj5jZW50cm8gZGUgZGF0b3M8L3RleHQ+CgogIDx0ZXh0IHg9IjMzNiIgeT0iMjYyIiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNUI3Qzk5Ij5zZXBhcmFkYXMgZsOtc2ljYW1lbnRlLDwvdGV4dD4KICA8dGV4dCB4PSIzMzYiIHk9IjI4MCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+dW5pZGFzIHBvciByZWQgZGUgYmFqYSBsYXRlbmNpYTwvdGV4dD4KCiAgPCEtLSBVYmljYWNpb25lcyBkZSBib3JkZSAtLT4KICA8cmVjdCB4PSI1MjQiIHk9IjIwIiB3aWR0aD0iMTc2IiBoZWlnaHQ9IjQxMCIgcng9IjEwIiBmaWxsPSIjRjdGOUZCIiBzdHJva2U9IiM3QjRGQTgiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNyA1Ii8+CiAgPHRleHQgeD0iNjEyIiB5PSI0OCIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9IjY1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzRBMkU2NiI+VWJpY2FjaW9uZXM8L3RleHQ+CiAgPHRleHQgeD0iNjEyIiB5PSI2OCIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9IjY1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzRBMkU2NiI+ZGUgYm9yZGU8L3RleHQ+CgogIDxyZWN0IHg9IjU0NiIgeT0iOTIiIHdpZHRoPSIxMzIiIGhlaWdodD0iNDQiIHJ4PSI2IiBmaWxsPSIjRURFM0Y1IiBzdHJva2U9IiM3QjRGQTgiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNjEyIiB5PSIxMjAiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM0QTJFNjYiPkJvZ290w6E8L3RleHQ+CiAgPHJlY3QgeD0iNTQ2IiB5PSIxNTAiIHdpZHRoPSIxMzIiIGhlaWdodD0iNDQiIHJ4PSI2IiBmaWxsPSIjRURFM0Y1IiBzdHJva2U9IiM3QjRGQTgiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNjEyIiB5PSIxNzgiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM0QTJFNjYiPkxpbWE8L3RleHQ+CiAgPHJlY3QgeD0iNTQ2IiB5PSIyMDgiIHdpZHRoPSIxMzIiIGhlaWdodD0iNDQiIHJ4PSI2IiBmaWxsPSIjRURFM0Y1IiBzdHJva2U9IiM3QjRGQTgiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNjEyIiB5PSIyMzYiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM0QTJFNjYiPkNpdWRhZCBkZSBNw6l4aWNvPC90ZXh0PgoKICA8dGV4dCB4PSI2MTIiIHk9IjMwMCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+bcOhcyBudW1lcm9zYXM8L3RleHQ+CiAgPHRleHQgeD0iNjEyIiB5PSIzMjAiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM1QjdDOTkiPnF1ZSBsYXMgcmVnaW9uZXM8L3RleHQ+CiAgPHRleHQgeD0iNjEyIiB5PSIzNDgiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM1QjdDOTkiPnNpcnZlbiBjb250ZW5pZG88L3RleHQ+CiAgPHRleHQgeD0iNjEyIiB5PSIzNjgiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM1QjdDOTkiPmVuIGNhY2jDqSBjZXJjYTwvdGV4dD4KICA8dGV4dCB4PSI2MTIiIHk9IjM4OCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+ZGVsIHVzdWFyaW88L3RleHQ+Cjwvc3ZnPgo="},{"id":"tec-02","dominio":"tecnologia","enunciado":"¿Qué factores se consideran al elegir una región de AWS? Selecciona dos.","imagen":"regiones-az.svg","opciones":["El cumplimiento normativo sobre dónde deben residir los datos","La cercanía a los usuarios para reducir la latencia","El idioma de la consola de administración","La cantidad de usuarios IAM de la cuenta"],"correctas":[0,1],"explicacion":"Los cuatro criterios que enseña el curso son cumplimiento, latencia, disponibilidad del servicio en esa región y precio, que varía entre regiones. El idioma de la consola y el número de usuarios no dependen de la región.","referencia":"Infraestructura global · Elección de región","imagen_datos":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjAgNDUwIiBmb250LWZhbWlseT0iU2Vnb2UgVUksIFJvYm90bywgSGVsdmV0aWNhLCBBcmlhbCwgc2Fucy1zZXJpZiI+CiAgPHJlY3Qgd2lkdGg9IjcyMCIgaGVpZ2h0PSI0NTAiIGZpbGw9IiNmZmZmZmYiLz4KCiAgPCEtLSBSZWdpb24gLS0+CiAgPHJlY3QgeD0iMjAiIHk9IjIwIiB3aWR0aD0iNDg0IiBoZWlnaHQ9IjQxMCIgcng9IjEwIiBmaWxsPSIjRjdGOUZCIiBzdHJva2U9IiMzRjZFQTYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNyA1Ii8+CiAgPHRleHQgeD0iNDIiIHk9IjQ4IiBmb250LXNpemU9IjE3IiBmb250LXdlaWdodD0iNjUwIiBmaWxsPSIjM0Y2RUE2Ij5SZWdpw7NuPC90ZXh0PgogIDx0ZXh0IHg9IjQyIiB5PSI3MCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzVCN0M5OSI+ZWplbXBsbzogc2EtZWFzdC0xIChTw6NvIFBhdWxvKTwvdGV4dD4KCiAgPCEtLSBBWiAxIC0tPgogIDxyZWN0IHg9IjQ0IiB5PSI5MCIgd2lkdGg9IjQzNiIgaGVpZ2h0PSI5OCIgcng9IjgiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzVCN0M5OSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iNjQiIHk9IjExOCIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzE3MjIyQiI+Wm9uYSBkZSBkaXNwb25pYmlsaWRhZCBBPC90ZXh0PgogIDxyZWN0IHg9IjY0IiB5PSIxMzAiIHdpZHRoPSIxMjAiIGhlaWdodD0iNDAiIHJ4PSI1IiBmaWxsPSIjRUFGM0VBIiBzdHJva2U9IiMyRTdENUIiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iMTI0IiB5PSIxNTUiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxRjVCNDEiPmNlbnRybyBkZSBkYXRvczwvdGV4dD4KICA8cmVjdCB4PSIxOTYiIHk9IjEzMCIgd2lkdGg9IjEyMCIgaGVpZ2h0PSI0MCIgcng9IjUiIGZpbGw9IiNFQUYzRUEiIHN0cm9rZT0iIzJFN0Q1QiIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8dGV4dCB4PSIyNTYiIHk9IjE1NSIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFGNUI0MSI+Y2VudHJvIGRlIGRhdG9zPC90ZXh0PgoKICA8IS0tIEFaIDIgLS0+CiAgPHJlY3QgeD0iNDQiIHk9IjIwMiIgd2lkdGg9IjQzNiIgaGVpZ2h0PSI5OCIgcng9IjgiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzVCN0M5OSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iNjQiIHk9IjIzMCIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzE3MjIyQiI+Wm9uYSBkZSBkaXNwb25pYmlsaWRhZCBCPC90ZXh0PgogIDxyZWN0IHg9IjY0IiB5PSIyNDIiIHdpZHRoPSIxMjAiIGhlaWdodD0iNDAiIHJ4PSI1IiBmaWxsPSIjRUFGM0VBIiBzdHJva2U9IiMyRTdENUIiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iMTI0IiB5PSIyNjciIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxRjVCNDEiPmNlbnRybyBkZSBkYXRvczwvdGV4dD4KCiAgPCEtLSBBWiAzIC0tPgogIDxyZWN0IHg9IjQ0IiB5PSIzMTQiIHdpZHRoPSI0MzYiIGhlaWdodD0iOTgiIHJ4PSI4IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiM1QjdDOTkiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjY0IiB5PSIzNDIiIGZvbnQtc2l6ZT0iMTUiIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiMxNzIyMkIiPlpvbmEgZGUgZGlzcG9uaWJpbGlkYWQgQzwvdGV4dD4KICA8cmVjdCB4PSI2NCIgeT0iMzU0IiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjQwIiByeD0iNSIgZmlsbD0iI0VBRjNFQSIgc3Ryb2tlPSIjMkU3RDVCIiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDx0ZXh0IHg9IjEyNCIgeT0iMzc5IiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMUY1QjQxIj5jZW50cm8gZGUgZGF0b3M8L3RleHQ+CgogIDx0ZXh0IHg9IjMzNiIgeT0iMjYyIiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNUI3Qzk5Ij5zZXBhcmFkYXMgZsOtc2ljYW1lbnRlLDwvdGV4dD4KICA8dGV4dCB4PSIzMzYiIHk9IjI4MCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+dW5pZGFzIHBvciByZWQgZGUgYmFqYSBsYXRlbmNpYTwvdGV4dD4KCiAgPCEtLSBVYmljYWNpb25lcyBkZSBib3JkZSAtLT4KICA8cmVjdCB4PSI1MjQiIHk9IjIwIiB3aWR0aD0iMTc2IiBoZWlnaHQ9IjQxMCIgcng9IjEwIiBmaWxsPSIjRjdGOUZCIiBzdHJva2U9IiM3QjRGQTgiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNyA1Ii8+CiAgPHRleHQgeD0iNjEyIiB5PSI0OCIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9IjY1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzRBMkU2NiI+VWJpY2FjaW9uZXM8L3RleHQ+CiAgPHRleHQgeD0iNjEyIiB5PSI2OCIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9IjY1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzRBMkU2NiI+ZGUgYm9yZGU8L3RleHQ+CgogIDxyZWN0IHg9IjU0NiIgeT0iOTIiIHdpZHRoPSIxMzIiIGhlaWdodD0iNDQiIHJ4PSI2IiBmaWxsPSIjRURFM0Y1IiBzdHJva2U9IiM3QjRGQTgiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNjEyIiB5PSIxMjAiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM0QTJFNjYiPkJvZ290w6E8L3RleHQ+CiAgPHJlY3QgeD0iNTQ2IiB5PSIxNTAiIHdpZHRoPSIxMzIiIGhlaWdodD0iNDQiIHJ4PSI2IiBmaWxsPSIjRURFM0Y1IiBzdHJva2U9IiM3QjRGQTgiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNjEyIiB5PSIxNzgiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM0QTJFNjYiPkxpbWE8L3RleHQ+CiAgPHJlY3QgeD0iNTQ2IiB5PSIyMDgiIHdpZHRoPSIxMzIiIGhlaWdodD0iNDQiIHJ4PSI2IiBmaWxsPSIjRURFM0Y1IiBzdHJva2U9IiM3QjRGQTgiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNjEyIiB5PSIyMzYiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM0QTJFNjYiPkNpdWRhZCBkZSBNw6l4aWNvPC90ZXh0PgoKICA8dGV4dCB4PSI2MTIiIHk9IjMwMCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+bcOhcyBudW1lcm9zYXM8L3RleHQ+CiAgPHRleHQgeD0iNjEyIiB5PSIzMjAiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM1QjdDOTkiPnF1ZSBsYXMgcmVnaW9uZXM8L3RleHQ+CiAgPHRleHQgeD0iNjEyIiB5PSIzNDgiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM1QjdDOTkiPnNpcnZlbiBjb250ZW5pZG88L3RleHQ+CiAgPHRleHQgeD0iNjEyIiB5PSIzNjgiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM1QjdDOTkiPmVuIGNhY2jDqSBjZXJjYTwvdGV4dD4KICA8dGV4dCB4PSI2MTIiIHk9IjM4OCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+ZGVsIHVzdWFyaW88L3RleHQ+Cjwvc3ZnPgo="},{"id":"tec-03","dominio":"tecnologia","enunciado":"¿Qué servicio entrega contenido desde las ubicaciones de borde para reducir la latencia de los usuarios?","imagen":"regiones-az.svg","opciones":["Amazon CloudFront","Amazon VPC","AWS Direct Connect","Amazon EBS"],"correctas":[0],"explicacion":"CloudFront es la red de entrega de contenido de AWS. Guarda copias en caché en las ubicaciones de borde, que son muchas más que las regiones, y sirve al usuario desde la más cercana.","referencia":"Amazon CloudFront","imagen_datos":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjAgNDUwIiBmb250LWZhbWlseT0iU2Vnb2UgVUksIFJvYm90bywgSGVsdmV0aWNhLCBBcmlhbCwgc2Fucy1zZXJpZiI+CiAgPHJlY3Qgd2lkdGg9IjcyMCIgaGVpZ2h0PSI0NTAiIGZpbGw9IiNmZmZmZmYiLz4KCiAgPCEtLSBSZWdpb24gLS0+CiAgPHJlY3QgeD0iMjAiIHk9IjIwIiB3aWR0aD0iNDg0IiBoZWlnaHQ9IjQxMCIgcng9IjEwIiBmaWxsPSIjRjdGOUZCIiBzdHJva2U9IiMzRjZFQTYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNyA1Ii8+CiAgPHRleHQgeD0iNDIiIHk9IjQ4IiBmb250LXNpemU9IjE3IiBmb250LXdlaWdodD0iNjUwIiBmaWxsPSIjM0Y2RUE2Ij5SZWdpw7NuPC90ZXh0PgogIDx0ZXh0IHg9IjQyIiB5PSI3MCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzVCN0M5OSI+ZWplbXBsbzogc2EtZWFzdC0xIChTw6NvIFBhdWxvKTwvdGV4dD4KCiAgPCEtLSBBWiAxIC0tPgogIDxyZWN0IHg9IjQ0IiB5PSI5MCIgd2lkdGg9IjQzNiIgaGVpZ2h0PSI5OCIgcng9IjgiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzVCN0M5OSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iNjQiIHk9IjExOCIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzE3MjIyQiI+Wm9uYSBkZSBkaXNwb25pYmlsaWRhZCBBPC90ZXh0PgogIDxyZWN0IHg9IjY0IiB5PSIxMzAiIHdpZHRoPSIxMjAiIGhlaWdodD0iNDAiIHJ4PSI1IiBmaWxsPSIjRUFGM0VBIiBzdHJva2U9IiMyRTdENUIiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iMTI0IiB5PSIxNTUiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxRjVCNDEiPmNlbnRybyBkZSBkYXRvczwvdGV4dD4KICA8cmVjdCB4PSIxOTYiIHk9IjEzMCIgd2lkdGg9IjEyMCIgaGVpZ2h0PSI0MCIgcng9IjUiIGZpbGw9IiNFQUYzRUEiIHN0cm9rZT0iIzJFN0Q1QiIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8dGV4dCB4PSIyNTYiIHk9IjE1NSIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFGNUI0MSI+Y2VudHJvIGRlIGRhdG9zPC90ZXh0PgoKICA8IS0tIEFaIDIgLS0+CiAgPHJlY3QgeD0iNDQiIHk9IjIwMiIgd2lkdGg9IjQzNiIgaGVpZ2h0PSI5OCIgcng9IjgiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzVCN0M5OSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iNjQiIHk9IjIzMCIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzE3MjIyQiI+Wm9uYSBkZSBkaXNwb25pYmlsaWRhZCBCPC90ZXh0PgogIDxyZWN0IHg9IjY0IiB5PSIyNDIiIHdpZHRoPSIxMjAiIGhlaWdodD0iNDAiIHJ4PSI1IiBmaWxsPSIjRUFGM0VBIiBzdHJva2U9IiMyRTdENUIiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iMTI0IiB5PSIyNjciIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxRjVCNDEiPmNlbnRybyBkZSBkYXRvczwvdGV4dD4KCiAgPCEtLSBBWiAzIC0tPgogIDxyZWN0IHg9IjQ0IiB5PSIzMTQiIHdpZHRoPSI0MzYiIGhlaWdodD0iOTgiIHJ4PSI4IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiM1QjdDOTkiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjY0IiB5PSIzNDIiIGZvbnQtc2l6ZT0iMTUiIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiMxNzIyMkIiPlpvbmEgZGUgZGlzcG9uaWJpbGlkYWQgQzwvdGV4dD4KICA8cmVjdCB4PSI2NCIgeT0iMzU0IiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjQwIiByeD0iNSIgZmlsbD0iI0VBRjNFQSIgc3Ryb2tlPSIjMkU3RDVCIiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDx0ZXh0IHg9IjEyNCIgeT0iMzc5IiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMUY1QjQxIj5jZW50cm8gZGUgZGF0b3M8L3RleHQ+CgogIDx0ZXh0IHg9IjMzNiIgeT0iMjYyIiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNUI3Qzk5Ij5zZXBhcmFkYXMgZsOtc2ljYW1lbnRlLDwvdGV4dD4KICA8dGV4dCB4PSIzMzYiIHk9IjI4MCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+dW5pZGFzIHBvciByZWQgZGUgYmFqYSBsYXRlbmNpYTwvdGV4dD4KCiAgPCEtLSBVYmljYWNpb25lcyBkZSBib3JkZSAtLT4KICA8cmVjdCB4PSI1MjQiIHk9IjIwIiB3aWR0aD0iMTc2IiBoZWlnaHQ9IjQxMCIgcng9IjEwIiBmaWxsPSIjRjdGOUZCIiBzdHJva2U9IiM3QjRGQTgiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNyA1Ii8+CiAgPHRleHQgeD0iNjEyIiB5PSI0OCIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9IjY1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzRBMkU2NiI+VWJpY2FjaW9uZXM8L3RleHQ+CiAgPHRleHQgeD0iNjEyIiB5PSI2OCIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9IjY1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzRBMkU2NiI+ZGUgYm9yZGU8L3RleHQ+CgogIDxyZWN0IHg9IjU0NiIgeT0iOTIiIHdpZHRoPSIxMzIiIGhlaWdodD0iNDQiIHJ4PSI2IiBmaWxsPSIjRURFM0Y1IiBzdHJva2U9IiM3QjRGQTgiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNjEyIiB5PSIxMjAiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM0QTJFNjYiPkJvZ290w6E8L3RleHQ+CiAgPHJlY3QgeD0iNTQ2IiB5PSIxNTAiIHdpZHRoPSIxMzIiIGhlaWdodD0iNDQiIHJ4PSI2IiBmaWxsPSIjRURFM0Y1IiBzdHJva2U9IiM3QjRGQTgiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNjEyIiB5PSIxNzgiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM0QTJFNjYiPkxpbWE8L3RleHQ+CiAgPHJlY3QgeD0iNTQ2IiB5PSIyMDgiIHdpZHRoPSIxMzIiIGhlaWdodD0iNDQiIHJ4PSI2IiBmaWxsPSIjRURFM0Y1IiBzdHJva2U9IiM3QjRGQTgiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNjEyIiB5PSIyMzYiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM0QTJFNjYiPkNpdWRhZCBkZSBNw6l4aWNvPC90ZXh0PgoKICA8dGV4dCB4PSI2MTIiIHk9IjMwMCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+bcOhcyBudW1lcm9zYXM8L3RleHQ+CiAgPHRleHQgeD0iNjEyIiB5PSIzMjAiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM1QjdDOTkiPnF1ZSBsYXMgcmVnaW9uZXM8L3RleHQ+CiAgPHRleHQgeD0iNjEyIiB5PSIzNDgiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM1QjdDOTkiPnNpcnZlbiBjb250ZW5pZG88L3RleHQ+CiAgPHRleHQgeD0iNjEyIiB5PSIzNjgiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM1QjdDOTkiPmVuIGNhY2jDqSBjZXJjYTwvdGV4dD4KICA8dGV4dCB4PSI2MTIiIHk9IjM4OCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+ZGVsIHVzdWFyaW88L3RleHQ+Cjwvc3ZnPgo="},{"id":"tec-04","dominio":"tecnologia","enunciado":"Un equipo necesita ejecutar código sin aprovisionar ni administrar servidores, pagando solo por el tiempo de ejecución. ¿Qué servicio corresponde?","opciones":["Amazon EC2","AWS Lambda","Amazon Lightsail","AWS Batch"],"correctas":[1],"explicacion":"Lambda ejecuta funciones en respuesta a eventos y se cobra por número de solicitudes y duración. No hay servidores que aprovisionar, parchear ni escalar: ese es el sentido de \"sin servidor\".","referencia":"AWS Lambda"},{"id":"tec-05","dominio":"tecnologia","enunciado":"¿Qué servicio ofrece almacenamiento de objetos con durabilidad muy alta, ideal para imágenes, copias de seguridad y archivos estáticos?","opciones":["Amazon EBS","Amazon S3","Amazon EFS","Amazon RDS"],"correctas":[1],"explicacion":"S3 guarda objetos en buckets, sin límite práctico de tamaño total, y replica los datos dentro de la región. EBS y EFS son almacenamiento de archivos o de bloques pensados para conectarse a instancias.","referencia":"Amazon S3"},{"id":"tec-06","dominio":"tecnologia","enunciado":"¿Qué servicio proporciona un volumen de almacenamiento en bloque que se conecta a una única instancia EC2, como si fuera un disco?","opciones":["Amazon S3","Amazon EBS","Amazon Glacier","AWS Storage Gateway"],"correctas":[1],"explicacion":"EBS ofrece volúmenes de bloque que se montan en una instancia dentro de la misma zona de disponibilidad y persisten aunque la instancia se detenga. Para compartir un sistema de archivos entre varias instancias se usa EFS.","referencia":"Amazon EBS"},{"id":"tec-07","dominio":"tecnologia","enunciado":"Una aplicación necesita una base de datos NoSQL de clave-valor con latencia de milisegundos y escalado automático. ¿Cuál elegir?","opciones":["Amazon RDS","Amazon Redshift","Amazon DynamoDB","Amazon Aurora"],"correctas":[2],"explicacion":"DynamoDB es la base NoSQL gestionada de AWS, sin servidores que administrar. RDS y Aurora son relacionales; Redshift es un almacén de datos para analítica.","referencia":"Amazon DynamoDB"},{"id":"tec-08","dominio":"tecnologia","enunciado":"El equipo de datos quiere ejecutar consultas analíticas sobre terabytes de información histórica de ventas. ¿Qué servicio está diseñado para eso?","opciones":["Amazon Redshift","Amazon DynamoDB","Amazon ElastiCache","Amazon Neptune"],"correctas":[0],"explicacion":"Redshift es el almacén de datos de AWS, optimizado para consultas analíticas sobre grandes volúmenes. Las bases transaccionales están pensadas para muchas operaciones pequeñas, no para agregaciones masivas.","referencia":"Amazon Redshift"},{"id":"tec-09","dominio":"tecnologia","enunciado":"¿Qué servicio permite crear una red aislada lógicamente dentro de AWS, con subredes y control de tráfico?","opciones":["Amazon Route 53","Amazon VPC","AWS Direct Connect","Elastic Load Balancing"],"correctas":[1],"explicacion":"VPC es tu red privada en AWS: defines el rango de direcciones, las subredes y las reglas de entrada y salida. Route 53 resuelve nombres de dominio y Direct Connect es una conexión dedicada desde tus instalaciones.","referencia":"Amazon VPC"},{"id":"tec-10","dominio":"tecnologia","enunciado":"¿Qué servicio registra quién hizo cada llamada a la API de AWS, desde qué dirección IP y cuándo?","opciones":["Amazon CloudWatch","AWS CloudTrail","AWS Config","Amazon Inspector"],"correctas":[1],"explicacion":"CloudTrail es el registro de auditoría de acciones sobre la cuenta. CloudWatch, en cambio, recoge métricas y registros de rendimiento y dispara alarmas. Es una pareja que el examen confunde a propósito: CloudTrail responde quién hizo qué, CloudWatch responde cómo va.","referencia":"AWS CloudTrail"},{"id":"tec-11","dominio":"tecnologia","enunciado":"Se quiere recibir una alerta cuando el uso de CPU de una instancia supere el 80 % durante cinco minutos. ¿Qué servicio se usa?","opciones":["Amazon CloudWatch","AWS CloudTrail","AWS Artifact","AWS Organizations"],"correctas":[0],"explicacion":"CloudWatch recoge métricas y permite crear alarmas que notifican o disparan una acción cuando se cruza un umbral, por ejemplo escalar el grupo de Auto Scaling.","referencia":"Amazon CloudWatch"},{"id":"tec-12","dominio":"tecnologia","enunciado":"¿De qué formas se puede interactuar con los servicios de AWS? Selecciona dos.","opciones":["Consola de administración en el navegador","Interfaz de línea de comandos (AWS CLI)","Conectándose por escritorio remoto al hipervisor","Enviando una solicitud escrita al soporte de AWS"],"correctas":[0,1],"explicacion":"Las tres vías oficiales son la consola, la CLI y los SDK para lenguajes de programación. Al hipervisor no accede ningún cliente: es infraestructura de AWS.","referencia":"Formas de acceso a AWS"},{"id":"tec-13","dominio":"tecnologia","enunciado":"El tráfico de un sitio web sube y baja mucho durante el día. ¿Qué combinación mantiene el rendimiento y evita pagar capacidad ociosa?","opciones":["Una sola instancia EC2 del tipo más grande disponible","Amazon EC2 Auto Scaling junto con Elastic Load Balancing","Amazon S3 con alojamiento de sitio estático únicamente","AWS Direct Connect hacia el centro de datos propio"],"correctas":[1],"explicacion":"Auto Scaling ajusta el número de instancias según la demanda y el balanceador reparte las solicitudes entre las que estén sanas. Una sola instancia grande no escala y además es un punto único de fallo.","referencia":"EC2 Auto Scaling y ELB"},{"id":"tec-14","dominio":"tecnologia","enunciado":"Una aplicación envía tareas a otro componente que las procesa a su propio ritmo, sin perder mensajes si el consumidor se cae. ¿Qué servicio corresponde?","opciones":["Amazon SQS","Amazon SNS","Amazon EventBridge","AWS Step Functions"],"correctas":[0],"explicacion":"SQS es una cola: los mensajes esperan hasta que alguien los procesa y confirma. SNS, en cambio, publica notificaciones a varios suscriptores a la vez y no las retiene esperando.","referencia":"Amazon SQS"},{"id":"fac-01","dominio":"facturacion","enunciado":"Una empresa con varias cuentas AWS quiere una sola factura y aprovechar los descuentos por volumen del uso combinado. ¿Qué le permite hacerlo?","imagen":"organizations-facturacion.svg","opciones":["La facturación consolidada de AWS Organizations","AWS Cost Explorer","El nivel gratuito de AWS","AWS Trusted Advisor"],"correctas":[0],"explicacion":"Organizations agrupa las cuentas bajo una cuenta de administración que recibe una factura única. Como el consumo se suma, es más fácil alcanzar los tramos de precio por volumen que si cada cuenta pagara aparte.","referencia":"AWS Organizations · Facturación consolidada","imagen_datos":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjAgNDIwIiBmb250LWZhbWlseT0iU2Vnb2UgVUksIFJvYm90bywgSGVsdmV0aWNhLCBBcmlhbCwgc2Fucy1zZXJpZiI+CiAgPHJlY3Qgd2lkdGg9IjcyMCIgaGVpZ2h0PSI0MjAiIGZpbGw9IiNmZmZmZmYiLz4KCiAgPHJlY3QgeD0iMjAiIHk9IjIwIiB3aWR0aD0iNjgwIiBoZWlnaHQ9IjM4MCIgcng9IjEwIiBmaWxsPSIjRjdGOUZCIiBzdHJva2U9IiMzRjZFQTYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNyA1Ii8+CiAgPHRleHQgeD0iNDAiIHk9IjQ4IiBmb250LXNpemU9IjE2IiBmb250LXdlaWdodD0iNjUwIiBmaWxsPSIjM0Y2RUE2Ij5Pcmdhbml6YWNpw7NuPC90ZXh0PgoKICA8IS0tIEN1ZW50YSBkZSBhZG1pbmlzdHJhY2lvbiAtLT4KICA8cmVjdCB4PSIyNDgiIHk9IjY4IiB3aWR0aD0iMjI0IiBoZWlnaHQ9IjY2IiByeD0iOCIgZmlsbD0iI0U5RUZGNyIgc3Ryb2tlPSIjM0Y2RUE2IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSIzNjAiIHk9Ijk2IiBmb250LXNpemU9IjE1IiBmb250LXdlaWdodD0iNjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyMjJCIj5DdWVudGEgZGUgYWRtaW5pc3RyYWNpw7NuPC90ZXh0PgogIDx0ZXh0IHg9IjM2MCIgeT0iMTE4IiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNUI3Qzk5Ij5yZWNpYmUgdW5hIHNvbGEgZmFjdHVyYTwvdGV4dD4KCiAgPCEtLSBPVXMgLS0+CiAgPHJlY3QgeD0iNjAiIHk9IjE5NiIgd2lkdGg9IjI3MCIgaGVpZ2h0PSIxODAiIHJ4PSI4IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiM1QjdDOTkiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNiA0Ii8+CiAgPHRleHQgeD0iODAiIHk9IjIyMiIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzE3MjIyQiI+VW5pZGFkIG9yZ2FuaXphdGl2YTogUHJvZHVjY2nDs248L3RleHQ+CgogIDxyZWN0IHg9Ijg0IiB5PSIyMzgiIHdpZHRoPSIxMDQiIGhlaWdodD0iNTIiIHJ4PSI2IiBmaWxsPSIjRkRGMUU3IiBzdHJva2U9IiNFODg3M0EiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iMTM2IiB5PSIyNjIiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzIyMkIiPkN1ZW50YTwvdGV4dD4KICA8dGV4dCB4PSIxMzYiIHk9IjI3OSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+dGllbmRhPC90ZXh0PgoKICA8cmVjdCB4PSIyMDIiIHk9IjIzOCIgd2lkdGg9IjEwNCIgaGVpZ2h0PSI1MiIgcng9IjYiIGZpbGw9IiNGREYxRTciIHN0cm9rZT0iI0U4ODczQSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8dGV4dCB4PSIyNTQiIHk9IjI2MiIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MjIyQiI+Q3VlbnRhPC90ZXh0PgogIDx0ZXh0IHg9IjI1NCIgeT0iMjc5IiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNUI3Qzk5Ij5wYWdvczwvdGV4dD4KCiAgPHJlY3QgeD0iODQiIHk9IjMwNiIgd2lkdGg9IjIyMiIgaGVpZ2h0PSI0OCIgcng9IjYiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzhDOTZBMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjUgNCIvPgogIDx0ZXh0IHg9IjE5NSIgeT0iMzM2IiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNUI3Qzk5Ij5wb2zDrXRpY2EgZGUgY29udHJvbCBkZSBzZXJ2aWNpb3M8L3RleHQ+CgogIDxyZWN0IHg9IjM5MCIgeT0iMTk2IiB3aWR0aD0iMjcwIiBoZWlnaHQ9IjE4MCIgcng9IjgiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzVCN0M5OSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI2IDQiLz4KICA8dGV4dCB4PSI0MTAiIHk9IjIyMiIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzE3MjIyQiI+VW5pZGFkIG9yZ2FuaXphdGl2YTogRGVzYXJyb2xsbzwvdGV4dD4KCiAgPHJlY3QgeD0iNDE0IiB5PSIyMzgiIHdpZHRoPSIxMDQiIGhlaWdodD0iNTIiIHJ4PSI2IiBmaWxsPSIjRkRGMUU3IiBzdHJva2U9IiNFODg3M0EiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNDY2IiB5PSIyNjIiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzIyMkIiPkN1ZW50YTwvdGV4dD4KICA8dGV4dCB4PSI0NjYiIHk9IjI3OSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+cHJ1ZWJhczwvdGV4dD4KCiAgPHJlY3QgeD0iNTMyIiB5PSIyMzgiIHdpZHRoPSIxMDQiIGhlaWdodD0iNTIiIHJ4PSI2IiBmaWxsPSIjRkRGMUU3IiBzdHJva2U9IiNFODg3M0EiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNTg0IiB5PSIyNjIiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzIyMkIiPkN1ZW50YTwvdGV4dD4KICA8dGV4dCB4PSI1ODQiIHk9IjI3OSIgZm9udC1zaXplPSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+bGFib3JhdG9yaW88L3RleHQ+CgogIDxyZWN0IHg9IjQxNCIgeT0iMzA2IiB3aWR0aD0iMjIyIiBoZWlnaHQ9IjQ4IiByeD0iNiIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjOEM5NkEwIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iNSA0Ii8+CiAgPHRleHQgeD0iNTI1IiB5PSIzMzYiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM1QjdDOTkiPnBvbMOtdGljYSBkZSBjb250cm9sIGRlIHNlcnZpY2lvczwvdGV4dD4KCiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJvIiBtYXJrZXJXaWR0aD0iOSIgbWFya2VySGVpZ2h0PSI5IiByZWZYPSI3IiByZWZZPSIzLjIiIG9yaWVudD0iYXV0byI+CiAgICAgIDxwYXRoIGQ9Ik0wLDAgTDcsMy4yIEwwLDYuNCB6IiBmaWxsPSIjNUI3Qzk5Ii8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPGxpbmUgeDE9IjMzMCIgeTE9IjEzNCIgeDI9IjE5NSIgeTI9IjE5MiIgc3Ryb2tlPSIjNUI3Qzk5IiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjbykiLz4KICA8bGluZSB4MT0iMzkwIiB5MT0iMTM0IiB4Mj0iNTI1IiB5Mj0iMTkyIiBzdHJva2U9IiM1QjdDOTkiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNvKSIvPgoKICA8dGV4dCB4PSIzNjAiIHk9IjE3MiIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+ZWwgdXNvIGRlIHRvZGFzIGxhcyBjdWVudGFzIHNlIHN1bWE8L3RleHQ+Cjwvc3ZnPgo="},{"id":"fac-02","dominio":"facturacion","enunciado":"Una empresa necesita respuesta en menos de 15 minutos para incidentes críticos y un administrador técnico de cuentas asignado. ¿Qué plan de soporte necesita?","opciones":["Básico","Developer","Business","Enterprise"],"correctas":[3],"explicacion":"El administrador técnico de cuentas y la respuesta de 15 minutos para cargas críticas caídas son propios del plan Enterprise. Business ofrece atención 24/7 por teléfono y chat, pero con tiempos de respuesta mayores.","referencia":"Planes de soporte de AWS"},{"id":"fac-03","dominio":"facturacion","enunciado":"El equipo quiere recibir un aviso cuando el gasto del mes se acerque a un límite definido. ¿Qué herramienta usa?","opciones":["AWS Budgets","AWS Cost Explorer","AWS Pricing Calculator","AWS Artifact"],"correctas":[0],"explicacion":"Budgets fija umbrales de costo o de uso y envía alertas al acercarse o superarlos. Cost Explorer sirve para analizar el gasto ya ocurrido y ver tendencias, no para avisar.","referencia":"AWS Budgets"},{"id":"fac-04","dominio":"facturacion","enunciado":"Antes de migrar, una empresa quiere estimar cuánto costaría su arquitectura en AWS. ¿Qué herramienta usa?","opciones":["AWS Pricing Calculator","AWS Cost Explorer","AWS Budgets","Informe de costos y uso"],"correctas":[0],"explicacion":"Pricing Calculator estima el costo de una arquitectura que todavía no existe. Las otras tres trabajan sobre consumo real ya facturado.","referencia":"AWS Pricing Calculator"},{"id":"fac-05","dominio":"facturacion","enunciado":"¿Qué ofrece AWS Trusted Advisor?","opciones":["Informes de auditoría y certificaciones de cumplimiento","Recomendaciones sobre costos, rendimiento, seguridad, tolerancia a fallos y límites de servicio","Un canal de chat con ingenieros de soporte las 24 horas","Estimaciones de precio de arquitecturas nuevas"],"correctas":[1],"explicacion":"Trusted Advisor revisa la cuenta y sugiere mejoras en cinco categorías. Todas las cuentas ven un conjunto básico de comprobaciones; el catálogo completo llega con los planes Business y superiores.","referencia":"AWS Trusted Advisor"}]};
+
+/* ---------------- utilidades ---------------- */
+const $ = (id) => document.getElementById(id);
+const LETRAS = ["A", "B", "C", "D", "E", "F"];
+const CLAVE = "repaso-aws:" + (BANCO.certificacion || "generico");
+const UMBRAL = Number(BANCO.umbral) || 70;
+
+function barajar(lista) {
+  const copia = lista.slice();
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copia[i], copia[j]] = [copia[j], copia[i]];
+  }
+  return copia;
+}
+
+function leerHistorial() {
+  try {
+    return JSON.parse(localStorage.getItem(CLAVE)) || { falladas: [], sesiones: [] };
+  } catch (e) {
+    return { falladas: [], sesiones: [] };
+  }
+}
+
+function guardarHistorial(datos) {
+  try { localStorage.setItem(CLAVE, JSON.stringify(datos)); } catch (e) { /* modo privado */ }
+}
+
+function nombreDominio(id) {
+  const d = (BANCO.dominios || []).find((x) => x.id === id);
+  return d ? d.nombre : id;
+}
+
+function mismasRespuestas(a, b) {
+  if (a.length !== b.length) return false;
+  const x = a.slice().sort(), y = b.slice().sort();
+  return x.every((v, i) => v === y[i]);
+}
+
+/* ---------------- estado ---------------- */
+let dominiosElegidos = new Set();
+let modo = "estudio";
+let sesion = null;
+
+/* ---------------- portada ---------------- */
+function pintarPortada() {
+  $("sello-cert").textContent = BANCO.certificacion || "";
+  $("titulo-cert").textContent = BANCO.titulo || "Repaso";
+  $("desc-cert").textContent = BANCO.descripcion || "";
+
+  const cont = $("chips-dominios");
+  cont.innerHTML = "";
+  (BANCO.dominios || []).forEach((d) => {
+    const total = BANCO.preguntas.filter((p) => p.dominio === d.id).length;
+    const b = document.createElement("button");
+    b.className = "chip";
+    b.setAttribute("aria-pressed", "true");
+    b.dataset.dominio = d.id;
+    b.innerHTML = d.nombre + '<span class="n">' + total + "</span>";
+    b.addEventListener("click", () => {
+      const activo = b.getAttribute("aria-pressed") === "true";
+      b.setAttribute("aria-pressed", activo ? "false" : "true");
+      if (activo) dominiosElegidos.delete(d.id); else dominiosElegidos.add(d.id);
+      refrescarPortada();
+    });
+    dominiosElegidos.add(d.id);
+    cont.appendChild(b);
+  });
+
+  document.querySelectorAll(".modo").forEach((b) => {
+    b.addEventListener("click", () => {
+      modo = b.dataset.modo;
+      document.querySelectorAll(".modo").forEach((o) =>
+        o.setAttribute("aria-pressed", o === b ? "true" : "false"));
+    });
+  });
+
+  $("cuantas").addEventListener("input", (e) => { $("cuantas-valor").textContent = e.target.value; });
+  refrescarPortada();
+}
+
+function disponibles() {
+  return BANCO.preguntas.filter((p) => dominiosElegidos.has(p.dominio));
+}
+
+function refrescarPortada() {
+  const n = disponibles().length;
+  const rango = $("cuantas");
+  rango.max = Math.max(5, n);
+  if (Number(rango.value) > n) { rango.value = n; }
+  $("cuantas-valor").textContent = rango.value;
+  $("btn-empezar").disabled = n === 0;
+  $("btn-empezar").textContent = n === 0 ? "Elige al menos un dominio" : "Empezar";
+
+  const hist = leerHistorial();
+  const pendientes = hist.falladas.filter((id) => BANCO.preguntas.some((p) => p.id === id));
+  $("btn-falladas").classList.toggle("oculto", pendientes.length === 0);
+  $("btn-falladas").textContent = "Repasar las " + pendientes.length + " que fallé";
+
+  if (hist.sesiones.length) {
+    const u = hist.sesiones[hist.sesiones.length - 1];
+    $("nota-historial").textContent =
+      "Última sesión: " + u.aciertos + " de " + u.total + " (" + u.fecha + ").";
+  } else {
+    $("nota-historial").textContent = "";
+  }
+}
+
+/* ---------------- sesión ---------------- */
+function iniciarSesion(preguntas, etiqueta, modoSesion) {
+  if (!preguntas.length) return;
+  sesion = {
+    modo: modoSesion,
+    etiqueta: etiqueta,
+    indice: 0,
+    revisando: false,
+    items: preguntas.map((p) => {
+      const orden = barajar(p.opciones.map((_, i) => i));
+      return {
+        p: p,
+        orden: orden,
+        correctas: orden.reduce((acc, original, nuevo) => {
+          if (p.correctas.includes(original)) acc.push(nuevo);
+          return acc;
+        }, []),
+        elegidas: [],
+        respondida: false
+      };
+    }),
+    fin: modoSesion === "examen" ? Date.now() + preguntas.length * 120000 : null
+  };
+  mostrar("pantalla-pregunta");
+  $("titulo-sesion").textContent = etiqueta;
+  $("reloj").classList.toggle("oculto", modoSesion !== "examen");
+  if (modoSesion === "examen") arrancarReloj();
+  pintarPregunta();
+}
+
+let temporizador = null;
+function arrancarReloj() {
+  clearInterval(temporizador);
+  const tic = () => {
+    const resto = Math.max(0, sesion.fin - Date.now());
+    const m = Math.floor(resto / 60000), s = Math.floor((resto % 60000) / 1000);
+    $("reloj").textContent = "Tiempo restante " + m + ":" + String(s).padStart(2, "0");
+    $("reloj").classList.toggle("urgente", resto < 120000);
+    if (resto === 0) { clearInterval(temporizador); terminar(); }
+  };
+  tic();
+  temporizador = setInterval(tic, 1000);
+}
+
+function pintarPregunta() {
+  const it = sesion.items[sesion.indice];
+  const p = it.p;
+  const multiple = p.correctas.length > 1;
+
+  $("contador").textContent = (sesion.indice + 1) + " / " + sesion.items.length;
+  $("barra-progreso").style.width =
+    ((sesion.indice) / sesion.items.length * 100) + "%";
+  $("etiqueta-dominio").textContent = nombreDominio(p.dominio);
+  $("enunciado").textContent = p.enunciado;
+  $("aviso-multiple").classList.toggle("oculto", !multiple);
+
+  if (p.imagen_datos) {
+    $("diagrama").src = p.imagen_datos;
+    $("marco-diagrama").classList.remove("oculto");
+  } else {
+    $("marco-diagrama").classList.add("oculto");
+  }
+
+  const cont = $("opciones");
+  cont.innerHTML = "";
+  it.orden.forEach((original, nuevo) => {
+    const b = document.createElement("button");
+    b.className = "opcion";
+    b.setAttribute("aria-pressed", it.elegidas.includes(nuevo) ? "true" : "false");
+    b.innerHTML = '<span class="letra">' + LETRAS[nuevo] + "</span><span></span>";
+    b.lastChild.textContent = p.opciones[original];
+    b.addEventListener("click", () => alternar(nuevo, multiple));
+    cont.appendChild(b);
+  });
+
+  $("zona-explicacion").innerHTML = "";
+  if (it.respondida) mostrarCorreccion();
+  else actualizarBoton();
+  window.scrollTo({ top: 0 });
+}
+
+function alternar(indice, multiple) {
+  const it = sesion.items[sesion.indice];
+  if (it.respondida) return;
+  if (multiple) {
+    const pos = it.elegidas.indexOf(indice);
+    if (pos >= 0) it.elegidas.splice(pos, 1); else it.elegidas.push(indice);
+  } else {
+    it.elegidas = [indice];
+  }
+  document.querySelectorAll("#opciones .opcion").forEach((b, i) =>
+    b.setAttribute("aria-pressed", it.elegidas.includes(i) ? "true" : "false"));
+  actualizarBoton();
+}
+
+function actualizarBoton() {
+  const it = sesion.items[sesion.indice];
+  const btn = $("btn-accion");
+  const ultima = sesion.indice === sesion.items.length - 1;
+
+  if (sesion.revisando) {
+    btn.disabled = false;
+    btn.textContent = ultima ? "Volver al resultado" : "Siguiente";
+    return;
+  }
+  if (sesion.modo === "examen") {
+    btn.disabled = it.elegidas.length === 0;
+    btn.textContent = ultima ? "Terminar" : "Siguiente";
+    return;
+  }
+  if (it.respondida) {
+    btn.disabled = false;
+    btn.textContent = ultima ? "Ver resultado" : "Siguiente";
+  } else {
+    btn.disabled = it.elegidas.length === 0;
+    btn.textContent = "Comprobar";
+  }
+}
+
+function mostrarCorreccion() {
+  const it = sesion.items[sesion.indice];
+  const acerto = mismasRespuestas(it.elegidas, it.correctas);
+
+  document.querySelectorAll("#opciones .opcion").forEach((b, i) => {
+    b.disabled = true;
+    b.setAttribute("aria-pressed", "false");
+    if (it.correctas.includes(i)) b.dataset.estado = "ok";
+    else if (it.elegidas.includes(i)) b.dataset.estado = "mal";
+  });
+
+  const caja = document.createElement("div");
+  caja.className = "explicacion" + (acerto ? "" : " fallo");
+  const veredicto = document.createElement("p");
+  veredicto.className = "veredicto";
+  veredicto.textContent = acerto ? "Correcto" : "No es esa";
+  const texto = document.createElement("p");
+  texto.textContent = it.p.explicacion || "";
+  caja.appendChild(veredicto);
+  caja.appendChild(texto);
+  if (it.p.referencia) {
+    const ref = document.createElement("span");
+    ref.className = "ref";
+    ref.textContent = it.p.referencia;
+    caja.appendChild(ref);
+  }
+  $("zona-explicacion").innerHTML = "";
+  $("zona-explicacion").appendChild(caja);
+  actualizarBoton();
+}
+
+function accion() {
+  const it = sesion.items[sesion.indice];
+  const ultima = sesion.indice === sesion.items.length - 1;
+
+  if (!sesion.revisando && sesion.modo === "estudio" && !it.respondida) {
+    it.respondida = true;
+    mostrarCorreccion();
+    return;
+  }
+  if (!sesion.revisando && sesion.modo === "examen") it.respondida = true;
+
+  if (ultima) {
+    if (sesion.revisando) { sesion.revisando = false; mostrar("pantalla-resultado"); }
+    else terminar();
+    return;
+  }
+  sesion.indice++;
+  pintarPregunta();
+}
+
+/* ---------------- resultado ---------------- */
+function terminar() {
+  clearInterval(temporizador);
+  const total = sesion.items.length;
+  const aciertos = sesion.items.filter((it) => mismasRespuestas(it.elegidas, it.correctas)).length;
+  const pct = Math.round(aciertos / total * 100);
+
+  $("cifra-puntaje").innerHTML = pct + "<small>%</small>";
+  $("frase-puntaje").textContent = aciertos + " de " + total + " correctas";
+  $("umbral").textContent = (pct >= UMBRAL ? "Por encima" : "Por debajo") +
+    " del " + UMBRAL + " % orientativo de aprobación";
+
+  const porDominio = {};
+  sesion.items.forEach((it) => {
+    const d = it.p.dominio;
+    porDominio[d] = porDominio[d] || { ok: 0, n: 0 };
+    porDominio[d].n++;
+    if (mismasRespuestas(it.elegidas, it.correctas)) porDominio[d].ok++;
+  });
+
+  const cont = $("desglose-dominios");
+  cont.innerHTML = "";
+  Object.keys(porDominio).forEach((d) => {
+    const { ok, n } = porDominio[d];
+    const p = Math.round(ok / n * 100);
+    const div = document.createElement("div");
+    div.className = "dominio";
+    div.innerHTML =
+      '<div class="fila"><span></span><span>' + ok + "/" + n + "</span></div>" +
+      '<div class="riel"><i style="width:' + p + '%"></i></div>';
+    div.querySelector(".fila span").textContent = nombreDominio(d);
+    const barra = div.querySelector(".riel i");
+    barra.className = p >= UMBRAL ? "alto" : (p < 50 ? "bajo" : "");
+    cont.appendChild(div);
+  });
+
+  const hist = leerHistorial();
+  const falladas = new Set(hist.falladas);
+  sesion.items.forEach((it) => {
+    if (mismasRespuestas(it.elegidas, it.correctas)) falladas.delete(it.p.id);
+    else falladas.add(it.p.id);
+  });
+  hist.falladas = Array.from(falladas);
+  hist.sesiones.push({
+    fecha: new Date().toLocaleDateString("es-CO"),
+    aciertos: aciertos, total: total, modo: sesion.modo
+  });
+  hist.sesiones = hist.sesiones.slice(-20);
+  guardarHistorial(hist);
+
+  mostrar("pantalla-resultado");
+}
+
+/* ---------------- visor ---------------- */
+let escala = 1;
+function aplicarEscala() { $("img-visor").style.width = (100 * escala) + "%"; }
+
+function abrirVisor(src) {
+  $("img-visor").src = src;
+  escala = 1;
+  aplicarEscala();
+  $("visor").classList.remove("oculto");
+  document.body.style.overflow = "hidden";
+}
+function cerrarVisor() {
+  $("visor").classList.add("oculto");
+  document.body.style.overflow = "";
+}
+
+/* ---------------- navegación ---------------- */
+function mostrar(id) {
+  ["pantalla-inicio", "pantalla-pregunta", "pantalla-resultado"]
+    .forEach((s) => $(s).classList.toggle("oculto", s !== id));
+  window.scrollTo({ top: 0 });
+}
+
+function volverInicio() {
+  clearInterval(temporizador);
+  sesion = null;
+  refrescarPortada();
+  mostrar("pantalla-inicio");
+}
+
+/* ---------------- arranque ---------------- */
+pintarPortada();
+
+$("btn-empezar").addEventListener("click", () => {
+  const n = Number($("cuantas").value);
+  const elegidas = barajar(disponibles()).slice(0, n);
+  const etiqueta = modo === "examen" ? "Examen cronometrado" : "Sesión de estudio";
+  iniciarSesion(elegidas, etiqueta, modo);
+});
+
+$("btn-falladas").addEventListener("click", () => {
+  const hist = leerHistorial();
+  const preguntas = BANCO.preguntas.filter((p) => hist.falladas.includes(p.id));
+  iniciarSesion(barajar(preguntas), "Repaso de falladas", "estudio");
+});
+
+$("btn-accion").addEventListener("click", accion);
+$("btn-salir").addEventListener("click", volverInicio);
+$("btn-inicio").addEventListener("click", volverInicio);
+$("btn-otra").addEventListener("click", volverInicio);
+
+$("btn-revisar").addEventListener("click", () => {
+  sesion.revisando = true;
+  sesion.indice = 0;
+  sesion.items.forEach((it) => { it.respondida = true; });
+  mostrar("pantalla-pregunta");
+  pintarPregunta();
+});
+
+$("btn-ampliar").addEventListener("click", () => abrirVisor($("diagrama").src));
+$("diagrama").addEventListener("click", () => abrirVisor($("diagrama").src));
+$("cerrar-visor").addEventListener("click", cerrarVisor);
+$("zoom-mas").addEventListener("click", () => { escala = Math.min(escala * 1.4, 6); aplicarEscala(); });
+$("zoom-menos").addEventListener("click", () => { escala = Math.max(escala / 1.4, 1); aplicarEscala(); });
+$("zoom-ajustar").addEventListener("click", () => { escala = 1; aplicarEscala(); });
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !$("visor").classList.contains("oculto")) cerrarVisor();
+});
+</script>
+
+</body>
+</html>

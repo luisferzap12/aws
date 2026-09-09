@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F5F6F4">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Repaso AWS</title>
+<!--__CABECERA_PWA__-->
+<style>
+:root{
+  --papel:#F5F6F4;
+  --tinta:#17222B;
+  --tenue:#5B7C99;
+  --linea:#C9CEC9;
+  --vpc:#3F6EA6;
+  --acento:#E8873A;
+  --ok:#2E7D5B;
+  --ok-fondo:#EAF3EA;
+  --err:#B23B3B;
+  --err-fondo:#F8EBEB;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"Roboto Mono","SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--papel);
+  color:var(--tinta);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.5;
+  -webkit-text-size-adjust:100%;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.app{max-width:640px;margin:0 auto;padding:0 16px}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--vpc);outline-offset:2px}
+.oculto{display:none !important}
+
+/* ---------- barra superior ---------- */
+.barra{
+  position:sticky;top:0;z-index:20;background:var(--papel);
+  display:flex;align-items:center;gap:12px;
+  padding:14px 0 10px;border-bottom:1px solid var(--linea);
+}
+.barra .volver{
+  background:none;border:none;padding:4px 6px 4px 0;font-size:20px;line-height:1;color:var(--tenue);
+}
+.barra .titulo{font-size:15px;font-weight:600;flex:1;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.barra .contador{font-family:var(--mono);font-size:13px;color:var(--tenue);white-space:nowrap}
+.progreso{height:3px;background:var(--linea);position:sticky;top:52px;z-index:19}
+.progreso i{display:block;height:100%;background:var(--vpc);width:0;transition:width .25s ease}
+
+/* ---------- portada ---------- */
+.portada{padding:28px 0 40px}
+.sello{
+  font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--vpc);
+  border:1px solid var(--vpc);border-radius:4px;padding:3px 8px;display:inline-block;
+}
+.portada h1{font-size:30px;line-height:1.15;margin:16px 0 6px;font-weight:650;letter-spacing:-.02em}
+.portada p.sub{color:var(--tenue);margin:0 0 26px;max-width:44ch}
+
+.bloque{margin-bottom:26px}
+.bloque > h2{font-size:14px;font-weight:600;margin:0 0 10px;color:var(--tenue)}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  border:1.5px solid var(--linea);background:#fff;border-radius:999px;
+  padding:9px 14px;font-size:14px;
+}
+.chip[aria-pressed="true"]{border-color:var(--vpc);background:#E9EFF7;color:#1D4A78;font-weight:600}
+.chip .n{font-family:var(--mono);font-size:12px;color:var(--tenue);margin-left:6px}
+.chip[aria-pressed="true"] .n{color:#1D4A78}
+
+.modos{display:grid;gap:10px}
+.modo{
+  display:block;width:100%;text-align:left;background:#fff;
+  border:1.5px solid var(--linea);border-radius:8px;padding:14px 16px;
+}
+.modo[aria-pressed="true"]{border-color:var(--acento);background:#FDF1E7}
+.modo b{display:block;font-size:16px;font-weight:600;margin-bottom:2px}
+.modo span{font-size:13.5px;color:var(--tenue)}
+
+.deslizador{display:flex;align-items:center;gap:14px}
+.deslizador input{flex:1;accent-color:var(--vpc)}
+.deslizador output{font-family:var(--mono);font-size:15px;min-width:2.5ch;text-align:right}
+
+.principal{
+  width:100%;border:none;border-radius:8px;background:var(--vpc);color:#fff;
+  font-size:17px;font-weight:600;padding:16px;margin-top:6px;
+}
+.principal:disabled{background:var(--linea);color:#7C8A80}
+.secundario{
+  width:100%;border:1.5px solid var(--linea);border-radius:8px;background:#fff;
+  font-size:15px;padding:13px;margin-top:10px;
+}
+.nota{font-size:13px;color:var(--tenue);margin-top:14px}
+
+/* ---------- pregunta ---------- */
+.pregunta{padding:18px 0 130px}
+.etiqueta-dominio{
+  font-family:var(--mono);font-size:11.5px;color:var(--tenue);
+  text-transform:none;margin-bottom:10px;display:block;
+}
+.enunciado{font-size:19px;line-height:1.38;margin:0 0 8px;font-weight:500;letter-spacing:-.01em}
+.aviso-multiple{font-size:13.5px;color:var(--acento);font-weight:600;margin:0 0 14px}
+
+.marco-diagrama{
+  border:1.5px dashed var(--vpc);border-radius:8px;background:#fff;
+  padding:8px;margin:0 0 18px;position:relative;
+}
+.marco-diagrama img{display:block;width:100%;height:auto;border-radius:4px}
+.marco-diagrama .lupa{
+  position:absolute;right:14px;bottom:14px;background:rgba(23,34,43,.82);color:#fff;
+  border:none;border-radius:999px;font-size:12.5px;padding:7px 12px;
+}
+
+.opciones{display:grid;gap:10px;margin:0 0 18px}
+.opcion{
+  display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;
+  background:#fff;border:1.5px solid var(--linea);border-radius:8px;
+  padding:14px;min-height:56px;font-size:15.5px;line-height:1.4;
+}
+.opcion .letra{
+  flex:0 0 auto;width:26px;height:26px;border-radius:6px;border:1.5px solid var(--linea);
+  display:grid;place-items:center;font-family:var(--mono);font-size:13px;color:var(--tenue);
+}
+.opcion[aria-pressed="true"]{border-color:var(--vpc);background:#E9EFF7}
+.opcion[aria-pressed="true"] .letra{border-color:var(--vpc);background:var(--vpc);color:#fff}
+.opcion[data-estado="ok"]{border-color:var(--ok);background:var(--ok-fondo)}
+.opcion[data-estado="ok"] .letra{border-color:var(--ok);background:var(--ok);color:#fff}
+.opcion[data-estado="mal"]{border-color:var(--err);background:var(--err-fondo)}
+.opcion[data-estado="mal"] .letra{border-color:var(--err);background:var(--err);color:#fff}
+.opcion[disabled]{cursor:default;opacity:1}
+
+.explicacion{
+  border-left:3px solid var(--ok);background:#fff;border-radius:0 8px 8px 0;
+  padding:14px 16px;margin-bottom:18px;
+}
+.explicacion.fallo{border-left-color:var(--err)}
+.explicacion .veredicto{font-weight:650;font-size:15px;margin:0 0 6px}
+.explicacion p{margin:0;font-size:15px;line-height:1.5}
+.explicacion .ref{
+  font-family:var(--mono);font-size:12px;color:var(--tenue);margin-top:10px;display:block;
+}
+
+.pie{
+  position:fixed;left:0;right:0;bottom:0;z-index:25;
+  background:linear-gradient(to top,var(--papel) 72%,rgba(245,246,244,0));
+  padding:14px 16px calc(16px + env(safe-area-inset-bottom));
+}
+.pie .app{padding:0}
+.reloj{
+  font-family:var(--mono);font-size:13px;color:var(--tenue);
+  text-align:center;margin-bottom:8px;
+}
+.reloj.urgente{color:var(--err);font-weight:600}
+
+/* ---------- visor de diagrama ---------- */
+.visor{
+  position:fixed;inset:0;z-index:60;background:#0E161D;display:flex;flex-direction:column;
+}
+.visor .lienzo{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:12px;display:grid;place-items:start center}
+.visor img{background:#fff;border-radius:6px;display:block;transform-origin:top center}
+.visor .controles{
+  display:flex;gap:8px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+  background:#0E161D;border-top:1px solid #24343F;
+}
+.visor .controles button{
+  flex:1;background:#1B2932;border:1px solid #33474F;color:#E7EDF2;
+  border-radius:8px;padding:13px;font-size:15px;
+}
+
+/* ---------- resultados ---------- */
+.resultado{padding:26px 0 60px}
+.marcador{text-align:center;margin-bottom:8px}
+.marcador .cifra{font-size:60px;font-weight:650;line-height:1;letter-spacing:-.03em}
+.marcador .cifra small{font-size:24px;font-weight:500;color:var(--tenue)}
+.marcador .frase{color:var(--tenue);margin-top:8px;font-size:15px}
+.umbral{
+  font-family:var(--mono);font-size:12.5px;color:var(--tenue);
+  text-align:center;border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  padding:10px 0;margin:22px 0 26px;
+}
+.dominio{margin-bottom:16px}
+.dominio .fila{display:flex;justify-content:space-between;font-size:14.5px;margin-bottom:6px}
+.dominio .fila span:last-child{font-family:var(--mono);color:var(--tenue)}
+.riel{height:9px;background:#E4E7E3;border-radius:999px;overflow:hidden}
+.riel i{display:block;height:100%;background:var(--vpc);border-radius:999px}
+.riel i.bajo{background:var(--err)}
+.riel i.alto{background:var(--ok)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+</style>
+</head>
+<body>
+
+<!-- ===================== PORTADA ===================== -->
+<section id="pantalla-inicio">
+  <div class="app portada">
+    <span class="sello" id="sello-cert">SAA-C03</span>
+    <h1 id="titulo-cert">AWS Solutions Architect</h1>
+    <p class="sub" id="desc-cert"></p>
+
+    <div class="bloque">
+      <h2>Dominios que quieres repasar</h2>
+      <div class="chips" id="chips-dominios"></div>
+    </div>
+
+    <div class="bloque">
+      <h2>Cómo quieres practicar</h2>
+      <div class="modos">
+        <button class="modo" data-modo="estudio" aria-pressed="true">
+          <b>Estudio</b>
+          <span>Corriges pregunta por pregunta y lees la explicación al momento.</span>
+        </button>
+        <button class="modo" data-modo="examen" aria-pressed="false">
+          <b>Examen cronometrado</b>
+          <span>Dos minutos por pregunta, sin pistas. Las explicaciones llegan al final.</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="bloque">
+      <h2>Cuántas preguntas</h2>
+      <div class="deslizador">
+        <input type="range" id="cuantas" min="5" max="16" step="1" value="10" aria-label="Número de preguntas">
+        <output id="cuantas-valor">10</output>
+      </div>
+    </div>
+
+    <button class="principal" id="btn-empezar">Empezar</button>
+    <button class="secundario oculto" id="btn-falladas">Repasar las que fallé</button>
+    <p class="nota" id="nota-historial"></p>
+  </div>
+</section>
+
+<!-- ===================== PREGUNTA ===================== -->
+<section id="pantalla-pregunta" class="oculto">
+  <div class="app">
+    <div class="barra">
+      <button class="volver" id="btn-salir" aria-label="Salir de la sesión">←</button>
+      <span class="titulo" id="titulo-sesion"></span>
+      <span class="contador" id="contador"></span>
+    </div>
+  </div>
+  <div class="progreso"><i id="barra-progreso"></i></div>
+
+  <div class="app pregunta">
+    <span class="etiqueta-dominio" id="etiqueta-dominio"></span>
+    <h2 class="enunciado" id="enunciado"></h2>
+    <p class="aviso-multiple oculto" id="aviso-multiple">Selecciona dos respuestas</p>
+
+    <div class="marco-diagrama oculto" id="marco-diagrama">
+      <img id="diagrama" alt="Diagrama de arquitectura de la pregunta">
+      <button class="lupa" id="btn-ampliar">Ampliar</button>
+    </div>
+
+    <div class="opciones" id="opciones"></div>
+    <div id="zona-explicacion"></div>
+  </div>
+
+  <div class="pie">
+    <div class="app">
+      <div class="reloj oculto" id="reloj"></div>
+      <button class="principal" id="btn-accion" disabled>Comprobar</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== RESULTADOS ===================== -->
+<section id="pantalla-resultado" class="oculto">
+  <div class="app">
+    <div class="barra">
+      <button class="volver" id="btn-inicio" aria-label="Volver al inicio">←</button>
+      <span class="titulo">Resultado de la sesión</span>
+    </div>
+  </div>
+  <div class="app resultado">
+    <div class="marcador">
+      <div class="cifra" id="cifra-puntaje">0<small>%</small></div>
+      <div class="frase" id="frase-puntaje"></div>
+    </div>
+    <div class="umbral" id="umbral"></div>
+    <div id="desglose-dominios"></div>
+    <button class="principal" id="btn-revisar">Revisar las respuestas</button>
+    <button class="secundario" id="btn-otra">Otra sesión</button>
+  </div>
+</section>
+
+<!-- ===================== VISOR ===================== -->
+<div class="visor oculto" id="visor">
+  <div class="lienzo" id="lienzo-visor"><img id="img-visor" alt="Diagrama ampliado"></div>
+  <div class="controles">
+    <button id="zoom-menos" aria-label="Reducir">−</button>
+    <button id="zoom-ajustar">Ajustar</button>
+    <button id="zoom-mas" aria-label="Ampliar">+</button>
+    <button id="cerrar-visor">Cerrar</button>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* Los datos del banco los inyecta generar_app.py */
+const BANCO = /*__DATOS_BANCO__*/{};
+
+/* ---------------- utilidades ---------------- */
+const $ = (id) => document.getElementById(id);
+const LETRAS = ["A", "B", "C", "D", "E", "F"];
+const CLAVE = "repaso-aws:" + (BANCO.certificacion || "generico");
+const UMBRAL = Number(BANCO.umbral) || 70;
+
+function barajar(lista) {
+  const copia = lista.slice();
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copia[i], copia[j]] = [copia[j], copia[i]];
+  }
+  return copia;
+}
+
+function leerHistorial() {
+  try {
+    return JSON.parse(localStorage.getItem(CLAVE)) || { falladas: [], sesiones: [] };
+  } catch (e) {
+    return { falladas: [], sesiones: [] };
+  }
+}
+
+function guardarHistorial(datos) {
+  try { localStorage.setItem(CLAVE, JSON.stringify(datos)); } catch (e) { /* modo privado */ }
+}
+
+function nombreDominio(id) {
+  const d = (BANCO.dominios || []).find((x) => x.id === id);
+  return d ? d.nombre : id;
+}
+
+function mismasRespuestas(a, b) {
+  if (a.length !== b.length) return false;
+  const x = a.slice().sort(), y = b.slice().sort();
+  return x.every((v, i) => v === y[i]);
+}
+
+/* ---------------- estado ---------------- */
+let dominiosElegidos = new Set();
+let modo = "estudio";
+let sesion = null;
+
+/* ---------------- portada ---------------- */
+function pintarPortada() {
+  $("sello-cert").textContent = BANCO.certificacion || "";
+  $("titulo-cert").textContent = BANCO.titulo || "Repaso";
+  $("desc-cert").textContent = BANCO.descripcion || "";
+
+  const cont = $("chips-dominios");
+  cont.innerHTML = "";
+  (BANCO.dominios || []).forEach((d) => {
+    const total = BANCO.preguntas.filter((p) => p.dominio === d.id).length;
+    const b = document.createElement("button");
+    b.className = "chip";
+    b.setAttribute("aria-pressed", "true");
+    b.dataset.dominio = d.id;
+    b.innerHTML = d.nombre + '<span class="n">' + total + "</span>";
+    b.addEventListener("click", () => {
+      const activo = b.getAttribute("aria-pressed") === "true";
+      b.setAttribute("aria-pressed", activo ? "false" : "true");
+      if (activo) dominiosElegidos.delete(d.id); else dominiosElegidos.add(d.id);
+      refrescarPortada();
+    });
+    dominiosElegidos.add(d.id);
+    cont.appendChild(b);
+  });
+
+  document.querySelectorAll(".modo").forEach((b) => {
+    b.addEventListener("click", () => {
+      modo = b.dataset.modo;
+      document.querySelectorAll(".modo").forEach((o) =>
+        o.setAttribute("aria-pressed", o === b ? "true" : "false"));
+    });
+  });
+
+  $("cuantas").addEventListener("input", (e) => { $("cuantas-valor").textContent = e.target.value; });
+  refrescarPortada();
+}
+
+function disponibles() {
+  return BANCO.preguntas.filter((p) => dominiosElegidos.has(p.dominio));
+}
+
+function refrescarPortada() {
+  const n = disponibles().length;
+  const rango = $("cuantas");
+  rango.max = Math.max(5, n);
+  if (Number(rango.value) > n) { rango.value = n; }
+  $("cuantas-valor").textContent = rango.value;
+  $("btn-empezar").disabled = n === 0;
+  $("btn-empezar").textContent = n === 0 ? "Elige al menos un dominio" : "Empezar";
+
+  const hist = leerHistorial();
+  const pendientes = hist.falladas.filter((id) => BANCO.preguntas.some((p) => p.id === id));
+  $("btn-falladas").classList.toggle("oculto", pendientes.length === 0);
+  $("btn-falladas").textContent = "Repasar las " + pendientes.length + " que fallé";
+
+  if (hist.sesiones.length) {
+    const u = hist.sesiones[hist.sesiones.length - 1];
+    $("nota-historial").textContent =
+      "Última sesión: " + u.aciertos + " de " + u.total + " (" + u.fecha + ").";
+  } else {
+    $("nota-historial").textContent = "";
+  }
+}
+
+/* ---------------- sesión ---------------- */
+function iniciarSesion(preguntas, etiqueta, modoSesion) {
+  if (!preguntas.length) return;
+  sesion = {
+    modo: modoSesion,
+    etiqueta: etiqueta,
+    indice: 0,
+    revisando: false,
+    items: preguntas.map((p) => {
+      const orden = barajar(p.opciones.map((_, i) => i));
+      return {
+        p: p,
+        orden: orden,
+        correctas: orden.reduce((acc, original, nuevo) => {
+          if (p.correctas.includes(original)) acc.push(nuevo);
+          return acc;
+        }, []),
+        elegidas: [],
+        respondida: false
+      };
+    }),
+    fin: modoSesion === "examen" ? Date.now() + preguntas.length * 120000 : null
+  };
+  mostrar("pantalla-pregunta");
+  $("titulo-sesion").textContent = etiqueta;
+  $("reloj").classList.toggle("oculto", modoSesion !== "examen");
+  if (modoSesion === "examen") arrancarReloj();
+  pintarPregunta();
+}
+
+let temporizador = null;
+function arrancarReloj() {
+  clearInterval(temporizador);
+  const tic = () => {
+    const resto = Math.max(0, sesion.fin - Date.now());
+    const m = Math.floor(resto / 60000), s = Math.floor((resto % 60000) / 1000);
+    $("reloj").textContent = "Tiempo restante " + m + ":" + String(s).padStart(2, "0");
+    $("reloj").classList.toggle("urgente", resto < 120000);
+    if (resto === 0) { clearInterval(temporizador); terminar(); }
+  };
+  tic();
+  temporizador = setInterval(tic, 1000);
+}
+
+function pintarPregunta() {
+  const it = sesion.items[sesion.indice];
+  const p = it.p;
+  const multiple = p.correctas.length > 1;
+
+  $("contador").textContent = (sesion.indice + 1) + " / " + sesion.items.length;
+  $("barra-progreso").style.width =
+    ((sesion.indice) / sesion.items.length * 100) + "%";
+  $("etiqueta-dominio").textContent = nombreDominio(p.dominio);
+  $("enunciado").textContent = p.enunciado;
+  $("aviso-multiple").classList.toggle("oculto", !multiple);
+
+  if (p.imagen_datos) {
+    $("diagrama").src = p.imagen_datos;
+    $("marco-diagrama").classList.remove("oculto");
+  } else {
+    $("marco-diagrama").classList.add("oculto");
+  }
+
+  const cont = $("opciones");
+  cont.innerHTML = "";
+  it.orden.forEach((original, nuevo) => {
+    const b = document.createElement("button");
+    b.className = "opcion";
+    b.setAttribute("aria-pressed", it.elegidas.includes(nuevo) ? "true" : "false");
+    b.innerHTML = '<span class="letra">' + LETRAS[nuevo] + "</span><span></span>";
+    b.lastChild.textContent = p.opciones[original];
+    b.addEventListener("click", () => alternar(nuevo, multiple));
+    cont.appendChild(b);
+  });
+
+  $("zona-explicacion").innerHTML = "";
+  if (it.respondida) mostrarCorreccion();
+  else actualizarBoton();
+  window.scrollTo({ top: 0 });
+}
+
+function alternar(indice, multiple) {
+  const it = sesion.items[sesion.indice];
+  if (it.respondida) return;
+  if (multiple) {
+    const pos = it.elegidas.indexOf(indice);
+    if (pos >= 0) it.elegidas.splice(pos, 1); else it.elegidas.push(indice);
+  } else {
+    it.elegidas = [indice];
+  }
+  document.querySelectorAll("#opciones .opcion").forEach((b, i) =>
+    b.setAttribute("aria-pressed", it.elegidas.includes(i) ? "true" : "false"));
+  actualizarBoton();
+}
+
+function actualizarBoton() {
+  const it = sesion.items[sesion.indice];
+  const btn = $("btn-accion");
+  const ultima = sesion.indice === sesion.items.length - 1;
+
+  if (sesion.revisando) {
+    btn.disabled = false;
+    btn.textContent = ultima ? "Volver al resultado" : "Siguiente";
+    return;
+  }
+  if (sesion.modo === "examen") {
+    btn.disabled = it.elegidas.length === 0;
+    btn.textContent = ultima ? "Terminar" : "Siguiente";
+    return;
+  }
+  if (it.respondida) {
+    btn.disabled = false;
+    btn.textContent = ultima ? "Ver resultado" : "Siguiente";
+  } else {
+    btn.disabled = it.elegidas.length === 0;
+    btn.textContent = "Comprobar";
+  }
+}
+
+function mostrarCorreccion() {
+  const it = sesion.items[sesion.indice];
+  const acerto = mismasRespuestas(it.elegidas, it.correctas);
+
+  document.querySelectorAll("#opciones .opcion").forEach((b, i) => {
+    b.disabled = true;
+    b.setAttribute("aria-pressed", "false");
+    if (it.correctas.includes(i)) b.dataset.estado = "ok";
+    else if (it.elegidas.includes(i)) b.dataset.estado = "mal";
+  });
+
+  const caja = document.createElement("div");
+  caja.className = "explicacion" + (acerto ? "" : " fallo");
+  const veredicto = document.createElement("p");
+  veredicto.className = "veredicto";
+  veredicto.textContent = acerto ? "Correcto" : "No es esa";
+  const texto = document.createElement("p");
+  texto.textContent = it.p.explicacion || "";
+  caja.appendChild(veredicto);
+  caja.appendChild(texto);
+  if (it.p.referencia) {
+    const ref = document.createElement("span");
+    ref.className = "ref";
+    ref.textContent = it.p.referencia;
+    caja.appendChild(ref);
+  }
+  $("zona-explicacion").innerHTML = "";
+  $("zona-explicacion").appendChild(caja);
+  actualizarBoton();
+}
+
+function accion() {
+  const it = sesion.items[sesion.indice];
+  const ultima = sesion.indice === sesion.items.length - 1;
+
+  if (!sesion.revisando && sesion.modo === "estudio" && !it.respondida) {
+    it.respondida = true;
+    mostrarCorreccion();
+    return;
+  }
+  if (!sesion.revisando && sesion.modo === "examen") it.respondida = true;
+
+  if (ultima) {
+    if (sesion.revisando) { sesion.revisando = false; mostrar("pantalla-resultado"); }
+    else terminar();
+    return;
+  }
+  sesion.indice++;
+  pintarPregunta();
+}
+
+/* ---------------- resultado ---------------- */
+function terminar() {
+  clearInterval(temporizador);
+  const total = sesion.items.length;
+  const aciertos = sesion.items.filter((it) => mismasRespuestas(it.elegidas, it.correctas)).length;
+  const pct = Math.round(aciertos / total * 100);
+
+  $("cifra-puntaje").innerHTML = pct + "<small>%</small>";
+  $("frase-puntaje").textContent = aciertos + " de " + total + " correctas";
+  $("umbral").textContent = (pct >= UMBRAL ? "Por encima" : "Por debajo") +
+    " del " + UMBRAL + " % orientativo de aprobación";
+
+  const porDominio = {};
+  sesion.items.forEach((it) => {
+    const d = it.p.dominio;
+    porDominio[d] = porDominio[d] || { ok: 0, n: 0 };
+    porDominio[d].n++;
+    if (mismasRespuestas(it.elegidas, it.correctas)) porDominio[d].ok++;
+  });
+
+  const cont = $("desglose-dominios");
+  cont.innerHTML = "";
+  Object.keys(porDominio).forEach((d) => {
+    const { ok, n } = porDominio[d];
+    const p = Math.round(ok / n * 100);
+    const div = document.createElement("div");
+    div.className = "dominio";
+    div.innerHTML =
+      '<div class="fila"><span></span><span>' + ok + "/" + n + "</span></div>" +
+      '<div class="riel"><i style="width:' + p + '%"></i></div>';
+    div.querySelector(".fila span").textContent = nombreDominio(d);
+    const barra = div.querySelector(".riel i");
+    barra.className = p >= UMBRAL ? "alto" : (p < 50 ? "bajo" : "");
+    cont.appendChild(div);
+  });
+
+  const hist = leerHistorial();
+  const falladas = new Set(hist.falladas);
+  sesion.items.forEach((it) => {
+    if (mismasRespuestas(it.elegidas, it.correctas)) falladas.delete(it.p.id);
+    else falladas.add(it.p.id);
+  });
+  hist.falladas = Array.from(falladas);
+  hist.sesiones.push({
+    fecha: new Date().toLocaleDateString("es-CO"),
+    aciertos: aciertos, total: total, modo: sesion.modo
+  });
+  hist.sesiones = hist.sesiones.slice(-20);
+  guardarHistorial(hist);
+
+  mostrar("pantalla-resultado");
+}
+
+/* ---------------- visor ---------------- */
+let escala = 1;
+function aplicarEscala() { $("img-visor").style.width = (100 * escala) + "%"; }
+
+function abrirVisor(src) {
+  $("img-visor").src = src;
+  escala = 1;
+  aplicarEscala();
+  $("visor").classList.remove("oculto");
+  document.body.style.overflow = "hidden";
+}
+function cerrarVisor() {
+  $("visor").classList.add("oculto");
+  document.body.style.overflow = "";
+}
+
+/* ---------------- navegación ---------------- */
+function mostrar(id) {
+  ["pantalla-inicio", "pantalla-pregunta", "pantalla-resultado"]
+    .forEach((s) => $(s).classList.toggle("oculto", s !== id));
+  window.scrollTo({ top: 0 });
+}
+
+function volverInicio() {
+  clearInterval(temporizador);
+  sesion = null;
+  refrescarPortada();
+  mostrar("pantalla-inicio");
+}
+
+/* ---------------- arranque ---------------- */
+pintarPortada();
+
+$("btn-empezar").addEventListener("click", () => {
+  const n = Number($("cuantas").value);
+  const elegidas = barajar(disponibles()).slice(0, n);
+  const etiqueta = modo === "examen" ? "Examen cronometrado" : "Sesión de estudio";
+  iniciarSesion(elegidas, etiqueta, modo);
+});
+
+$("btn-falladas").addEventListener("click", () => {
+  const hist = leerHistorial();
+  const preguntas = BANCO.preguntas.filter((p) => hist.falladas.includes(p.id));
+  iniciarSesion(barajar(preguntas), "Repaso de falladas", "estudio");
+});
+
+$("btn-accion").addEventListener("click", accion);
+$("btn-salir").addEventListener("click", volverInicio);
+$("btn-inicio").addEventListener("click", volverInicio);
+$("btn-otra").addEventListener("click", volverInicio);
+
+$("btn-revisar").addEventListener("click", () => {
+  sesion.revisando = true;
+  sesion.indice = 0;
+  sesion.items.forEach((it) => { it.respondida = true; });
+  mostrar("pantalla-pregunta");
+  pintarPregunta();
+});
+
+$("btn-ampliar").addEventListener("click", () => abrirVisor($("diagrama").src));
+$("diagrama").addEventListener("click", () => abrirVisor($("diagrama").src));
+$("cerrar-visor").addEventListener("click", cerrarVisor);
+$("zoom-mas").addEventListener("click", () => { escala = Math.min(escala * 1.4, 6); aplicarEscala(); });
+$("zoom-menos").addEventListener("click", () => { escala = Math.max(escala / 1.4, 1); aplicarEscala(); });
+$("zoom-ajustar").addEventListener("click", () => { escala = 1; aplicarEscala(); });
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !$("visor").classList.contains("oculto")) cerrarVisor();
+});
+</script>
+<!--__REGISTRO_SW__-->
+</body>
+</html>

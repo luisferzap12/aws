@@ -1,0 +1,241 @@
+{
+  "certificacion": "SAA-C03",
+  "titulo": "AWS Solutions Architect Associate",
+  "descripcion": "Banco de repaso con diagramas de arquitectura, explicación por pregunta y seguimiento por dominio.",
+  "umbral": 72,
+  "dominios": [
+    { "id": "seguridad", "nombre": "Arquitecturas seguras", "peso": 30 },
+    { "id": "resiliencia", "nombre": "Arquitecturas resilientes", "peso": 26 },
+    { "id": "rendimiento", "nombre": "Alto rendimiento", "peso": 24 },
+    { "id": "costos", "nombre": "Optimización de costos", "peso": 20 }
+  ],
+  "preguntas": [
+    {
+      "id": "seg-01",
+      "dominio": "seguridad",
+      "enunciado": "Las instancias EC2 de la subred privada deben descargar parches del sistema operativo desde internet, pero nadie desde internet puede iniciar una conexión hacia ellas. ¿Qué recurso corresponde al bloque marcado con signos de interrogación?",
+      "imagen": "vpc-subredes.svg",
+      "opciones": [
+        "Un NAT Gateway en la subred pública",
+        "Un segundo Internet Gateway asociado a la subred privada",
+        "Un endpoint de VPC de tipo gateway hacia S3",
+        "Un bastión con reglas de reenvío de puertos"
+      ],
+      "correctas": [0],
+      "explicacion": "El NAT Gateway vive en la subred pública y traduce el tráfico saliente de la subred privada. Permite conexiones iniciadas desde adentro hacia afuera, nunca al revés. Un IGW no puede asociarse a una subred privada sin volverla pública, y un endpoint de gateway solo cubre S3 y DynamoDB, no los repositorios de parches.",
+      "referencia": "VPC · NAT Gateway"
+    },
+    {
+      "id": "seg-02",
+      "dominio": "seguridad",
+      "enunciado": "Una aplicación en EC2 necesita leer objetos de un bucket S3. ¿Cuál es la forma recomendada de otorgar ese permiso?",
+      "opciones": [
+        "Guardar las claves de acceso de un usuario IAM en un archivo de configuración de la instancia",
+        "Asociar un rol IAM a la instancia mediante un perfil de instancia",
+        "Poner el bucket en acceso público de solo lectura",
+        "Crear un usuario IAM por instancia y rotar las claves con un cron"
+      ],
+      "correctas": [1],
+      "explicacion": "El rol IAM entrega credenciales temporales que se rotan solas a través del servicio de metadatos de la instancia. Nunca hay claves de larga duración escritas en disco. Guardar claves estáticas o abrir el bucket al público son antipatrones clásicos del examen.",
+      "referencia": "IAM · Roles para EC2"
+    },
+    {
+      "id": "seg-03",
+      "dominio": "seguridad",
+      "enunciado": "Cumplimiento exige que los objetos de S3 se cifren en reposo, que la organización controle la política de la clave y que quede registro de cada uso de la clave en CloudTrail. ¿Qué opción cumple?",
+      "opciones": [
+        "SSE-S3 con claves gestionadas por Amazon S3",
+        "SSE-KMS con una clave gestionada por el cliente",
+        "Cifrado en el cliente con una clave guardada en Parameter Store",
+        "Solo forzar HTTPS en la política del bucket"
+      ],
+      "correctas": [1],
+      "explicacion": "Solo la clave gestionada por el cliente en KMS permite escribir una política de clave propia y auditar cada llamada de cifrado y descifrado en CloudTrail. SSE-S3 cifra, pero la clave la controla AWS. Forzar HTTPS protege el tráfico en tránsito, no el reposo.",
+      "referencia": "S3 · SSE-KMS"
+    },
+    {
+      "id": "seg-04",
+      "dominio": "seguridad",
+      "enunciado": "¿Qué afirmaciones sobre grupos de seguridad y ACL de red son correctas? Selecciona dos.",
+      "opciones": [
+        "El grupo de seguridad tiene estado: si permites la entrada, la respuesta sale automáticamente",
+        "La ACL de red no tiene estado: necesita reglas de entrada y de salida por separado",
+        "El grupo de seguridad admite reglas de denegación explícita",
+        "La ACL de red se asocia a una interfaz de red, no a una subred"
+      ],
+      "correctas": [0, 1],
+      "explicacion": "El grupo de seguridad es stateful y solo admite reglas de permitir; se asocia a interfaces de red. La ACL de red es stateless, admite permitir y denegar, se evalúa por número de regla y se asocia a la subred completa.",
+      "referencia": "VPC · Grupos de seguridad y NACL"
+    },
+    {
+      "id": "res-01",
+      "dominio": "resiliencia",
+      "enunciado": "Observa el despliegue. La base de datos está configurada como Multi-AZ. El equipo quiere descargar las consultas de lectura de la primaria hacia la instancia en espera. ¿Qué responderías?",
+      "imagen": "alta-disponibilidad.svg",
+      "opciones": [
+        "Es posible activando lecturas en la instancia en espera desde la consola",
+        "No es posible: la instancia en espera de Multi-AZ no atiende tráfico; hay que crear réplicas de lectura",
+        "Es posible si se apunta el ALB directamente a la instancia en espera",
+        "No es posible con RDS, hay que migrar a DynamoDB"
+      ],
+      "correctas": [1],
+      "explicacion": "En un despliegue Multi-AZ clásico la réplica síncrona existe solo para conmutación por error y permanece inaccesible. Para repartir lecturas se usan réplicas de lectura, que son asíncronas y sí aceptan conexiones. Es una distinción que el examen repite mucho: Multi-AZ es disponibilidad, réplica de lectura es escalabilidad.",
+      "referencia": "RDS · Multi-AZ vs réplicas de lectura"
+    },
+    {
+      "id": "res-02",
+      "dominio": "resiliencia",
+      "enunciado": "Un servicio productor genera pedidos más rápido de lo que el consumidor puede procesarlos, y algunos mensajes fallan de forma repetida. ¿Qué diseño aísla el problema?",
+      "opciones": [
+        "Llamar al consumidor de forma síncrona con reintentos exponenciales",
+        "Publicar en un tema de SNS con suscripción HTTP",
+        "Encolar en SQS y configurar una cola de mensajes fallidos",
+        "Escribir en un archivo compartido en EFS y procesarlo por lotes"
+      ],
+      "correctas": [2],
+      "explicacion": "SQS desacopla los ritmos de productor y consumidor y absorbe los picos. La cola de mensajes fallidos recoge lo que supera el número máximo de recepciones, evitando que un mensaje envenenado bloquee el procesamiento. SNS distribuye, pero no amortigua ni reintenta con la misma garantía.",
+      "referencia": "SQS · Dead-letter queue"
+    },
+    {
+      "id": "res-03",
+      "dominio": "resiliencia",
+      "enunciado": "Una empresa necesita recuperarse en una segunda región con un RPO de segundos y un RTO de pocos minutos, pero sin pagar una copia completa a plena capacidad todo el tiempo. ¿Qué estrategia encaja?",
+      "opciones": [
+        "Copia de seguridad y restauración",
+        "Piloto encendido (pilot light)",
+        "Espera activa reducida (warm standby)",
+        "Activo-activo multirregión"
+      ],
+      "correctas": [2],
+      "explicacion": "La espera activa reducida mantiene una copia funcional del entorno, más pequeña, con datos replicándose de forma continua; al fallar la región primaria solo hay que escalarla. El piloto encendido tiene los datos replicados pero la capa de cómputo apagada, lo que alarga el RTO. Activo-activo cumple, pero es la opción más cara.",
+      "referencia": "Estrategias de recuperación ante desastres"
+    },
+    {
+      "id": "res-04",
+      "dominio": "resiliencia",
+      "enunciado": "El grupo de Auto Scaling reemplaza instancias sanas de forma intermitente y los usuarios ven errores. La aplicación tarda cerca de cinco minutos en arrancar. ¿Qué ajuste es el más probable?",
+      "opciones": [
+        "Aumentar la capacidad máxima del grupo",
+        "Configurar un periodo de calentamiento de la comprobación de estado acorde al arranque",
+        "Cambiar el tipo de instancia a uno con más memoria",
+        "Desactivar las comprobaciones de estado del balanceador"
+      ],
+      "correctas": [1],
+      "explicacion": "Si la comprobación de estado empieza a evaluar antes de que la aplicación termine de arrancar, el grupo marca la instancia como no sana y la termina, entrando en un ciclo. El periodo de calentamiento le da margen. Desactivar la comprobación oculta el fallo en vez de resolverlo.",
+      "referencia": "Auto Scaling · Health check grace period"
+    },
+    {
+      "id": "ren-01",
+      "dominio": "rendimiento",
+      "enunciado": "El sitio sirve imágenes y archivos estáticos desde el bucket de la región us-east-1. Usuarios de tres continentes reportan lentitud. Según el diagrama, ¿qué configuración resuelve la latencia sin exponer el bucket?",
+      "imagen": "cloudfront-s3.svg",
+      "opciones": [
+        "Habilitar el alojamiento de sitio estático y hacer público el bucket",
+        "Replicar el bucket en cada región y repartir con Route 53",
+        "Poner CloudFront delante del bucket con control de acceso de origen",
+        "Aumentar el tipo de almacenamiento del bucket a S3 Express One Zone"
+      ],
+      "correctas": [2],
+      "explicacion": "CloudFront cachea los objetos en las ubicaciones de borde cercanas al usuario y solo consulta el origen cuando falla la caché. El control de acceso de origen deja que solo la distribución lea el bucket, así el bloqueo de acceso público sigue activo. Replicar buckets multiplica costo y complejidad para contenido estático.",
+      "referencia": "CloudFront · Origin Access Control"
+    },
+    {
+      "id": "ren-02",
+      "dominio": "rendimiento",
+      "enunciado": "Una aplicación de lectura intensiva repite las mismas consultas contra RDS y la CPU de la base se mantiene por encima del 90 %. ¿Qué agregas primero?",
+      "opciones": [
+        "ElastiCache delante de la base para servir los resultados repetidos",
+        "Un volumen EBS io2 con más IOPS",
+        "Una tabla de DynamoDB en paralelo",
+        "Un balanceador de carga de red frente a la base"
+      ],
+      "correctas": [0],
+      "explicacion": "Una caché en memoria elimina las consultas repetidas antes de que lleguen a la base, que es exactamente el patrón descrito. Subir las IOPS ayuda si el cuello es de disco, no de CPU por consultas repetidas.",
+      "referencia": "ElastiCache · Patrón cache-aside"
+    },
+    {
+      "id": "ren-03",
+      "dominio": "rendimiento",
+      "enunciado": "Varias instancias EC2 en distintas zonas de disponibilidad deben leer y escribir sobre el mismo conjunto de archivos con semántica de sistema de archivos POSIX. ¿Qué almacenamiento corresponde?",
+      "opciones": [
+        "Un volumen EBS conectado a la primera instancia y compartido por NFS",
+        "Amazon EFS",
+        "Un bucket S3 montado como unidad de red",
+        "Almacén de instancia local en cada EC2"
+      ],
+      "correctas": [1],
+      "explicacion": "EFS es un sistema de archivos NFS gestionado, accesible simultáneamente desde varias zonas de disponibilidad. Un volumen EBS vive en una sola zona y S3 es almacenamiento de objetos, sin semántica POSIX real.",
+      "referencia": "EFS · Almacenamiento compartido"
+    },
+    {
+      "id": "ren-04",
+      "dominio": "rendimiento",
+      "enunciado": "¿Qué opciones reducen la latencia percibida por usuarios lejanos de la región donde vive la aplicación? Selecciona dos.",
+      "opciones": [
+        "Distribuir el contenido con CloudFront",
+        "Usar AWS Global Accelerator para el tráfico TCP y UDP",
+        "Aumentar el tamaño de la instancia de la base de datos",
+        "Cambiar el volumen raíz a un tipo gp3"
+      ],
+      "correctas": [0, 1],
+      "explicacion": "CloudFront acerca el contenido cacheable al usuario y Global Accelerator lleva el tráfico a la red troncal de AWS desde la ubicación de borde más cercana, útil para aplicaciones no cacheables. Escalar la base o cambiar el volumen mejora el procesamiento, no la distancia de red.",
+      "referencia": "CloudFront y Global Accelerator"
+    },
+    {
+      "id": "cos-01",
+      "dominio": "costos",
+      "enunciado": "Una carga de trabajo de producción se ejecuta 24/7 con demanda estable y la empresa puede comprometerse a tres años. ¿Qué modelo de precio minimiza el costo?",
+      "opciones": [
+        "Instancias bajo demanda",
+        "Instancias de spot",
+        "Savings Plans o instancias reservadas a tres años",
+        "Hosts dedicados"
+      ],
+      "correctas": [2],
+      "explicacion": "El compromiso de uso a uno o tres años es lo que desbloquea los mayores descuentos frente a bajo demanda. Spot es más barato aún, pero AWS puede reclamar la capacidad con dos minutos de aviso, así que no encaja con producción estable e ininterrumpida.",
+      "referencia": "Savings Plans e instancias reservadas"
+    },
+    {
+      "id": "cos-02",
+      "dominio": "costos",
+      "enunciado": "Un procesamiento por lotes de análisis de video puede reiniciarse sin problema si se interrumpe y no tiene hora fija de entrega. ¿Qué opción de cómputo conviene?",
+      "opciones": [
+        "Instancias de spot",
+        "Instancias reservadas convertibles",
+        "Hosts dedicados",
+        "Instancias bajo demanda con Auto Scaling"
+      ],
+      "correctas": [0],
+      "explicacion": "La tolerancia a interrupciones y la ausencia de un plazo rígido son las dos señales que el examen usa para spot, con ahorros de hasta el 90 % frente a bajo demanda. Diseña el trabajo para guardar puntos de control y reanudar.",
+      "referencia": "EC2 · Instancias de spot"
+    },
+    {
+      "id": "cos-03",
+      "dominio": "costos",
+      "enunciado": "Registros de auditoría deben conservarse siete años. Casi nunca se consultan y, cuando se piden, una recuperación en hasta doce horas es aceptable. ¿Qué clase de almacenamiento elegir?",
+      "opciones": [
+        "S3 Standard-Infrequent Access",
+        "S3 Glacier Instant Retrieval",
+        "S3 Glacier Deep Archive",
+        "S3 Intelligent-Tiering en el nivel de acceso frecuente"
+      ],
+      "correctas": [2],
+      "explicacion": "Deep Archive es la clase de menor costo por gigabyte y está pensada justamente para retención legal de años con acceso rarísimo; sus recuperaciones se miden en horas, lo que aquí es aceptable. Glacier Instant Retrieval cuesta más porque garantiza acceso en milisegundos.",
+      "referencia": "S3 · Clases de almacenamiento"
+    },
+    {
+      "id": "cos-04",
+      "dominio": "costos",
+      "enunciado": "El equipo detecta un gasto alto en transferencia de datos: instancias EC2 en subredes privadas llaman a S3 en la misma región pasando por un NAT Gateway. ¿Qué cambio reduce el costo?",
+      "opciones": [
+        "Crear un endpoint de VPC de tipo gateway para S3",
+        "Aumentar el tamaño del NAT Gateway",
+        "Mover las instancias a la subred pública con IP elástica",
+        "Habilitar el cifrado en tránsito hacia S3"
+      ],
+      "correctas": [0],
+      "explicacion": "El endpoint de gateway para S3 enruta el tráfico por la red de AWS sin pasar por el NAT Gateway y no cobra por hora ni por gigabyte procesado. Es una de las optimizaciones de costo más repetidas del examen. Mover las instancias a la subred pública resolvería el cobro, pero rompe la postura de seguridad.",
+      "referencia": "VPC · Endpoints de gateway"
+    }
+  ]
+}

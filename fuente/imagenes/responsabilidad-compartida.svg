@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 470" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+  <rect width="720" height="470" fill="#ffffff"/>
+
+  <!-- Cliente -->
+  <rect x="20" y="20" width="336" height="430" rx="8" fill="#FDF1E7" stroke="#E8873A" stroke-width="2"/>
+  <text x="188" y="50" font-size="17" font-weight="650" text-anchor="middle" fill="#96541B">Cliente</text>
+  <text x="188" y="72" font-size="14" text-anchor="middle" fill="#96541B">seguridad EN la nube</text>
+
+  <rect x="42" y="92" width="292" height="52" rx="6" fill="#ffffff" stroke="#E8873A" stroke-width="1.5"/>
+  <text x="188" y="124" font-size="15" text-anchor="middle" fill="#17222B">Datos del cliente</text>
+
+  <rect x="42" y="156" width="292" height="52" rx="6" fill="#ffffff" stroke="#E8873A" stroke-width="1.5"/>
+  <text x="188" y="181" font-size="15" text-anchor="middle" fill="#17222B">Aplicaciones e identidades</text>
+  <text x="188" y="199" font-size="13" text-anchor="middle" fill="#5B7C99">usuarios, roles y permisos IAM</text>
+
+  <rect x="42" y="220" width="292" height="52" rx="6" fill="#ffffff" stroke="#E8873A" stroke-width="1.5"/>
+  <text x="188" y="245" font-size="15" text-anchor="middle" fill="#17222B">Sistema operativo invitado</text>
+  <text x="188" y="263" font-size="13" text-anchor="middle" fill="#5B7C99">parches y configuración</text>
+
+  <rect x="42" y="284" width="292" height="52" rx="6" fill="#ffffff" stroke="#E8873A" stroke-width="1.5"/>
+  <text x="188" y="309" font-size="15" text-anchor="middle" fill="#17222B">Configuración de red</text>
+  <text x="188" y="327" font-size="13" text-anchor="middle" fill="#5B7C99">grupos de seguridad y firewall</text>
+
+  <rect x="42" y="348" width="292" height="52" rx="6" fill="#ffffff" stroke="#E8873A" stroke-width="1.5"/>
+  <text x="188" y="373" font-size="15" text-anchor="middle" fill="#17222B">Cifrado de los datos</text>
+  <text x="188" y="391" font-size="13" text-anchor="middle" fill="#5B7C99">en reposo y en tránsito</text>
+
+  <!-- Linea divisoria -->
+  <line x1="364" y1="20" x2="364" y2="450" stroke="#C9CEC9" stroke-width="1.5" stroke-dasharray="6 5"/>
+
+  <!-- AWS -->
+  <rect x="372" y="20" width="328" height="430" rx="8" fill="#E9EFF7" stroke="#3F6EA6" stroke-width="2"/>
+  <text x="536" y="50" font-size="17" font-weight="650" text-anchor="middle" fill="#1D4A78">AWS</text>
+  <text x="536" y="72" font-size="14" text-anchor="middle" fill="#1D4A78">seguridad DE la nube</text>
+
+  <rect x="394" y="92" width="284" height="52" rx="6" fill="#ffffff" stroke="#3F6EA6" stroke-width="1.5"/>
+  <text x="536" y="124" font-size="15" text-anchor="middle" fill="#17222B">Software de los servicios</text>
+
+  <rect x="394" y="156" width="284" height="52" rx="6" fill="#ffffff" stroke="#3F6EA6" stroke-width="1.5"/>
+  <text x="536" y="181" font-size="15" text-anchor="middle" fill="#17222B">Cómputo, almacenamiento</text>
+  <text x="536" y="199" font-size="15" text-anchor="middle" fill="#17222B">bases de datos y red</text>
+
+  <rect x="394" y="220" width="284" height="52" rx="6" fill="#ffffff" stroke="#3F6EA6" stroke-width="1.5"/>
+  <text x="536" y="245" font-size="15" text-anchor="middle" fill="#17222B">Virtualización e hipervisor</text>
+  <text x="536" y="263" font-size="13" text-anchor="middle" fill="#5B7C99">y su parcheo</text>
+
+  <rect x="394" y="284" width="284" height="52" rx="6" fill="#ffffff" stroke="#3F6EA6" stroke-width="1.5"/>
+  <text x="536" y="316" font-size="15" text-anchor="middle" fill="#17222B">Hardware y red física</text>
+
+  <rect x="394" y="348" width="284" height="52" rx="6" fill="#ffffff" stroke="#3F6EA6" stroke-width="1.5"/>
+  <text x="536" y="373" font-size="15" text-anchor="middle" fill="#17222B">Regiones, zonas de</text>
+  <text x="536" y="391" font-size="15" text-anchor="middle" fill="#17222B">disponibilidad y bordes</text>
+
+  <text x="188" y="428" font-size="13" text-anchor="middle" fill="#96541B">lo que tú configuras</text>
+  <text x="536" y="428" font-size="13" text-anchor="middle" fill="#1D4A78">lo que AWS opera por ti</text>
+</svg>

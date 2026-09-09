@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F5F6F4">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Repaso AWS</title>
+<style>
+:root{
+  --papel:#F5F6F4;
+  --tinta:#17222B;
+  --tenue:#5B7C99;
+  --linea:#C9CEC9;
+  --vpc:#3F6EA6;
+  --acento:#E8873A;
+  --ok:#2E7D5B;
+  --ok-fondo:#EAF3EA;
+  --err:#B23B3B;
+  --err-fondo:#F8EBEB;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"Roboto Mono","SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--papel);
+  color:var(--tinta);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.5;
+  -webkit-text-size-adjust:100%;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.app{max-width:640px;margin:0 auto;padding:0 16px}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--vpc);outline-offset:2px}
+.oculto{display:none !important}
+
+/* ---------- barra superior ---------- */
+.barra{
+  position:sticky;top:0;z-index:20;background:var(--papel);
+  display:flex;align-items:center;gap:12px;
+  padding:14px 0 10px;border-bottom:1px solid var(--linea);
+}
+.barra .volver{
+  background:none;border:none;padding:4px 6px 4px 0;font-size:20px;line-height:1;color:var(--tenue);
+}
+.barra .titulo{font-size:15px;font-weight:600;flex:1;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.barra .contador{font-family:var(--mono);font-size:13px;color:var(--tenue);white-space:nowrap}
+.progreso{height:3px;background:var(--linea);position:sticky;top:52px;z-index:19}
+.progreso i{display:block;height:100%;background:var(--vpc);width:0;transition:width .25s ease}
+
+/* ---------- portada ---------- */
+.portada{padding:28px 0 40px}
+.sello{
+  font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--vpc);
+  border:1px solid var(--vpc);border-radius:4px;padding:3px 8px;display:inline-block;
+}
+.portada h1{font-size:30px;line-height:1.15;margin:16px 0 6px;font-weight:650;letter-spacing:-.02em}
+.portada p.sub{color:var(--tenue);margin:0 0 26px;max-width:44ch}
+
+.bloque{margin-bottom:26px}
+.bloque > h2{font-size:14px;font-weight:600;margin:0 0 10px;color:var(--tenue)}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  border:1.5px solid var(--linea);background:#fff;border-radius:999px;
+  padding:9px 14px;font-size:14px;
+}
+.chip[aria-pressed="true"]{border-color:var(--vpc);background:#E9EFF7;color:#1D4A78;font-weight:600}
+.chip .n{font-family:var(--mono);font-size:12px;color:var(--tenue);margin-left:6px}
+.chip[aria-pressed="true"] .n{color:#1D4A78}
+
+.modos{display:grid;gap:10px}
+.modo{
+  display:block;width:100%;text-align:left;background:#fff;
+  border:1.5px solid var(--linea);border-radius:8px;padding:14px 16px;
+}
+.modo[aria-pressed="true"]{border-color:var(--acento);background:#FDF1E7}
+.modo b{display:block;font-size:16px;font-weight:600;margin-bottom:2px}
+.modo span{font-size:13.5px;color:var(--tenue)}
+
+.deslizador{display:flex;align-items:center;gap:14px}
+.deslizador input{flex:1;accent-color:var(--vpc)}
+.deslizador output{font-family:var(--mono);font-size:15px;min-width:2.5ch;text-align:right}
+
+.principal{
+  width:100%;border:none;border-radius:8px;background:var(--vpc);color:#fff;
+  font-size:17px;font-weight:600;padding:16px;margin-top:6px;
+}
+.principal:disabled{background:var(--linea);color:#7C8A80}
+.secundario{
+  width:100%;border:1.5px solid var(--linea);border-radius:8px;background:#fff;
+  font-size:15px;padding:13px;margin-top:10px;
+}
+.nota{font-size:13px;color:var(--tenue);margin-top:14px}
+
+/* ---------- pregunta ---------- */
+.pregunta{padding:18px 0 130px}
+.etiqueta-dominio{
+  font-family:var(--mono);font-size:11.5px;color:var(--tenue);
+  text-transform:none;margin-bottom:10px;display:block;
+}
+.enunciado{font-size:19px;line-height:1.38;margin:0 0 8px;font-weight:500;letter-spacing:-.01em}
+.aviso-multiple{font-size:13.5px;color:var(--acento);font-weight:600;margin:0 0 14px}
+
+.marco-diagrama{
+  border:1.5px dashed var(--vpc);border-radius:8px;background:#fff;
+  padding:8px;margin:0 0 18px;position:relative;
+}
+.marco-diagrama img{display:block;width:100%;height:auto;border-radius:4px}
+.marco-diagrama .lupa{
+  position:absolute;right:14px;bottom:14px;background:rgba(23,34,43,.82);color:#fff;
+  border:none;border-radius:999px;font-size:12.5px;padding:7px 12px;
+}
+
+.opciones{display:grid;gap:10px;margin:0 0 18px}
+.opcion{
+  display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;
+  background:#fff;border:1.5px solid var(--linea);border-radius:8px;
+  padding:14px;min-height:56px;font-size:15.5px;line-height:1.4;
+}
+.opcion .letra{
+  flex:0 0 auto;width:26px;height:26px;border-radius:6px;border:1.5px solid var(--linea);
+  display:grid;place-items:center;font-family:var(--mono);font-size:13px;color:var(--tenue);
+}
+.opcion[aria-pressed="true"]{border-color:var(--vpc);background:#E9EFF7}
+.opcion[aria-pressed="true"] .letra{border-color:var(--vpc);background:var(--vpc);color:#fff}
+.opcion[data-estado="ok"]{border-color:var(--ok);background:var(--ok-fondo)}
+.opcion[data-estado="ok"] .letra{border-color:var(--ok);background:var(--ok);color:#fff}
+.opcion[data-estado="mal"]{border-color:var(--err);background:var(--err-fondo)}
+.opcion[data-estado="mal"] .letra{border-color:var(--err);background:var(--err);color:#fff}
+.opcion[disabled]{cursor:default;opacity:1}
+
+.explicacion{
+  border-left:3px solid var(--ok);background:#fff;border-radius:0 8px 8px 0;
+  padding:14px 16px;margin-bottom:18px;
+}
+.explicacion.fallo{border-left-color:var(--err)}
+.explicacion .veredicto{font-weight:650;font-size:15px;margin:0 0 6px}
+.explicacion p{margin:0;font-size:15px;line-height:1.5}
+.explicacion .ref{
+  font-family:var(--mono);font-size:12px;color:var(--tenue);margin-top:10px;display:block;
+}
+
+.pie{
+  position:fixed;left:0;right:0;bottom:0;z-index:25;
+  background:linear-gradient(to top,var(--papel) 72%,rgba(245,246,244,0));
+  padding:14px 16px calc(16px + env(safe-area-inset-bottom));
+}
+.pie .app{padding:0}
+.reloj{
+  font-family:var(--mono);font-size:13px;color:var(--tenue);
+  text-align:center;margin-bottom:8px;
+}
+.reloj.urgente{color:var(--err);font-weight:600}
+
+/* ---------- visor de diagrama ---------- */
+.visor{
+  position:fixed;inset:0;z-index:60;background:#0E161D;display:flex;flex-direction:column;
+}
+.visor .lienzo{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:12px;display:grid;place-items:start center}
+.visor img{background:#fff;border-radius:6px;display:block;transform-origin:top center}
+.visor .controles{
+  display:flex;gap:8px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+  background:#0E161D;border-top:1px solid #24343F;
+}
+.visor .controles button{
+  flex:1;background:#1B2932;border:1px solid #33474F;color:#E7EDF2;
+  border-radius:8px;padding:13px;font-size:15px;
+}
+
+/* ---------- resultados ---------- */
+.resultado{padding:26px 0 60px}
+.marcador{text-align:center;margin-bottom:8px}
+.marcador .cifra{font-size:60px;font-weight:650;line-height:1;letter-spacing:-.03em}
+.marcador .cifra small{font-size:24px;font-weight:500;color:var(--tenue)}
+.marcador .frase{color:var(--tenue);margin-top:8px;font-size:15px}
+.umbral{
+  font-family:var(--mono);font-size:12.5px;color:var(--tenue);
+  text-align:center;border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  padding:10px 0;margin:22px 0 26px;
+}
+.dominio{margin-bottom:16px}
+.dominio .fila{display:flex;justify-content:space-between;font-size:14.5px;margin-bottom:6px}
+.dominio .fila span:last-child{font-family:var(--mono);color:var(--tenue)}
+.riel{height:9px;background:#E4E7E3;border-radius:999px;overflow:hidden}
+.riel i{display:block;height:100%;background:var(--vpc);border-radius:999px}
+.riel i.bajo{background:var(--err)}
+.riel i.alto{background:var(--ok)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+</style>
+</head>
+<body>
+
+<!-- ===================== PORTADA ===================== -->
+<section id="pantalla-inicio">
+  <div class="app portada">
+    <span class="sello" id="sello-cert">SAA-C03</span>
+    <h1 id="titulo-cert">AWS Solutions Architect</h1>
+    <p class="sub" id="desc-cert"></p>
+
+    <div class="bloque">
+      <h2>Dominios que quieres repasar</h2>
+      <div class="chips" id="chips-dominios"></div>
+    </div>
+
+    <div class="bloque">
+      <h2>Cómo quieres practicar</h2>
+      <div class="modos">
+        <button class="modo" data-modo="estudio" aria-pressed="true">
+          <b>Estudio</b>
+          <span>Corriges pregunta por pregunta y lees la explicación al momento.</span>
+        </button>
+        <button class="modo" data-modo="examen" aria-pressed="false">
+          <b>Examen cronometrado</b>
+          <span>Dos minutos por pregunta, sin pistas. Las explicaciones llegan al final.</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="bloque">
+      <h2>Cuántas preguntas</h2>
+      <div class="deslizador">
+        <input type="range" id="cuantas" min="5" max="16" step="1" value="10" aria-label="Número de preguntas">
+        <output id="cuantas-valor">10</output>
+      </div>
+    </div>
+
+    <button class="principal" id="btn-empezar">Empezar</button>
+    <button class="secundario oculto" id="btn-falladas">Repasar las que fallé</button>
+    <p class="nota" id="nota-historial"></p>
+  </div>
+</section>
+
+<!-- ===================== PREGUNTA ===================== -->
+<section id="pantalla-pregunta" class="oculto">
+  <div class="app">
+    <div class="barra">
+      <button class="volver" id="btn-salir" aria-label="Salir de la sesión">←</button>
+      <span class="titulo" id="titulo-sesion"></span>
+      <span class="contador" id="contador"></span>
+    </div>
+  </div>
+  <div class="progreso"><i id="barra-progreso"></i></div>
+
+  <div class="app pregunta">
+    <span class="etiqueta-dominio" id="etiqueta-dominio"></span>
+    <h2 class="enunciado" id="enunciado"></h2>
+    <p class="aviso-multiple oculto" id="aviso-multiple">Selecciona dos respuestas</p>
+
+    <div class="marco-diagrama oculto" id="marco-diagrama">
+      <img id="diagrama" alt="Diagrama de arquitectura de la pregunta">
+      <button class="lupa" id="btn-ampliar">Ampliar</button>
+    </div>
+
+    <div class="opciones" id="opciones"></div>
+    <div id="zona-explicacion"></div>
+  </div>
+
+  <div class="pie">
+    <div class="app">
+      <div class="reloj oculto" id="reloj"></div>
+      <button class="principal" id="btn-accion" disabled>Comprobar</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== RESULTADOS ===================== -->
+<section id="pantalla-resultado" class="oculto">
+  <div class="app">
+    <div class="barra">
+      <button class="volver" id="btn-inicio" aria-label="Volver al inicio">←</button>
+      <span class="titulo">Resultado de la sesión</span>
+    </div>
+  </div>
+  <div class="app resultado">
+    <div class="marcador">
+      <div class="cifra" id="cifra-puntaje">0<small>%</small></div>
+      <div class="frase" id="frase-puntaje"></div>
+    </div>
+    <div class="umbral" id="umbral"></div>
+    <div id="desglose-dominios"></div>
+    <button class="principal" id="btn-revisar">Revisar las respuestas</button>
+    <button class="secundario" id="btn-otra">Otra sesión</button>
+  </div>
+</section>
+
+<!-- ===================== VISOR ===================== -->
+<div class="visor oculto" id="visor">
+  <div class="lienzo" id="lienzo-visor"><img id="img-visor" alt="Diagrama ampliado"></div>
+  <div class="controles">
+    <button id="zoom-menos" aria-label="Reducir">−</button>
+    <button id="zoom-ajustar">Ajustar</button>
+    <button id="zoom-mas" aria-label="Ampliar">+</button>
+    <button id="cerrar-visor">Cerrar</button>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* Los datos del banco los inyecta generar_app.py */
+const BANCO = {"certificacion":"SAA-C03","titulo":"AWS Solutions Architect Associate","descripcion":"Banco de repaso con diagramas de arquitectura, explicación por pregunta y seguimiento por dominio.","umbral":72,"dominios":[{"id":"seguridad","nombre":"Arquitecturas seguras","peso":30},{"id":"resiliencia","nombre":"Arquitecturas resilientes","peso":26},{"id":"rendimiento","nombre":"Alto rendimiento","peso":24},{"id":"costos","nombre":"Optimización de costos","peso":20}],"preguntas":[{"id":"seg-01","dominio":"seguridad","enunciado":"Las instancias EC2 de la subred privada deben descargar parches del sistema operativo desde internet, pero nadie desde internet puede iniciar una conexión hacia ellas. ¿Qué recurso corresponde al bloque marcado con signos de interrogación?","imagen":"vpc-subredes.svg","opciones":["Un NAT Gateway en la subred pública","Un segundo Internet Gateway asociado a la subred privada","Un endpoint de VPC de tipo gateway hacia S3","Un bastión con reglas de reenvío de puertos"],"correctas":[0],"explicacion":"El NAT Gateway vive en la subred pública y traduce el tráfico saliente de la subred privada. Permite conexiones iniciadas desde adentro hacia afuera, nunca al revés. Un IGW no puede asociarse a una subred privada sin volverla pública, y un endpoint de gateway solo cubre S3 y DynamoDB, no los repositorios de parches.","referencia":"VPC · NAT Gateway","imagen_datos":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjAgNDQwIiBmb250LWZhbWlseT0iU2Vnb2UgVUksIFJvYm90bywgSGVsdmV0aWNhLCBBcmlhbCwgc2Fucy1zZXJpZiI+CiAgPHJlY3Qgd2lkdGg9IjcyMCIgaGVpZ2h0PSI0NDAiIGZpbGw9IiNmZmZmZmYiLz4KCiAgPCEtLSBOdWJlIC8gUmVnaW9uIC0tPgogIDxyZWN0IHg9IjE2IiB5PSIxNiIgd2lkdGg9IjY4OCIgaGVpZ2h0PSI0MDgiIHJ4PSIxMCIgZmlsbD0iI0Y3RjlGQiIgc3Ryb2tlPSIjM0Y2RUE2IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjcgNSIvPgogIDx0ZXh0IHg9IjM0IiB5PSI0MiIgZm9udC1zaXplPSIxNyIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzNGNkVBNiI+UmVnacOzbiBBV1M8L3RleHQ+CgogIDwhLS0gVlBDIC0tPgogIDxyZWN0IHg9IjQwIiB5PSI1NiIgd2lkdGg9IjY0MCIgaGVpZ2h0PSIzNDgiIHJ4PSI4IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiM1QjdDOTkiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjU4IiB5PSI4MCIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzE3MjIyQiI+VlBDIDEwLjAuMC4wLzE2PC90ZXh0PgoKICA8IS0tIEludGVybmV0IEdhdGV3YXkgLS0+CiAgPHJlY3QgeD0iMzAwIiB5PSI5NiIgd2lkdGg9IjE1MCIgaGVpZ2h0PSI0MiIgcng9IjYiIGZpbGw9IiNFREUzRjUiIHN0cm9rZT0iIzdCNEZBOCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iMzc1IiB5PSIxMjMiIGZvbnQtc2l6ZT0iMTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM0QTJFNjYiPkludGVybmV0IEdhdGV3YXk8L3RleHQ+CgogIDwhLS0gSW50ZXJuZXQgLS0+CiAgPGNpcmNsZSBjeD0iMzc1IiBjeT0iMzQiIHI9IjAiIGZpbGw9Im5vbmUiLz4KICA8dGV4dCB4PSIzNzUiIHk9IjQyIiBmb250LXNpemU9IjE1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNUI3Qzk5Ij5JbnRlcm5ldDwvdGV4dD4KICA8bGluZSB4MT0iMzc1IiB5MT0iNTAiIHgyPSIzNzUiIHkyPSI5NiIgc3Ryb2tlPSIjNUI3Qzk5IiBzdHJva2Utd2lkdGg9IjIiLz4KCiAgPCEtLSBTdWJyZWQgcHVibGljYSAtLT4KICA8cmVjdCB4PSI2MiIgeT0iMTY0IiB3aWR0aD0iMjkwIiBoZWlnaHQ9IjIxNiIgcng9IjYiIGZpbGw9IiNFQUYzRUEiIHN0cm9rZT0iIzJFN0Q1QiIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iODAiIHk9IjE4OCIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzFGNUI0MSI+U3VicmVkIHDDumJsaWNhIDEwLjAuMS4wLzI0PC90ZXh0PgoKICA8cmVjdCB4PSIxMTAiIHk9IjIxNiIgd2lkdGg9IjE5NiIgaGVpZ2h0PSI1MiIgcng9IjYiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzJFN0Q1QiIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iMjA4IiB5PSIyNDgiIGZvbnQtc2l6ZT0iMTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzIyMkIiPj8gPyA/PC90ZXh0PgoKICA8cmVjdCB4PSIxMTAiIHk9IjMwMCIgd2lkdGg9IjE5NiIgaGVpZ2h0PSI0OCIgcng9IjYiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzhDOTZBMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjUgNCIvPgogIDx0ZXh0IHg9IjIwOCIgeT0iMzMwIiBmb250LXNpemU9IjE0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNUI3Qzk5Ij5UYWJsYSBkZSBydXRhcyDihpIgSUdXPC90ZXh0PgoKICA8IS0tIFN1YnJlZCBwcml2YWRhIC0tPgogIDxyZWN0IHg9IjM3NiIgeT0iMTY0IiB3aWR0aD0iMjkwIiBoZWlnaHQ9IjIxNiIgcng9IjYiIGZpbGw9IiNGREYxRTciIHN0cm9rZT0iI0U4ODczQSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iMzk0IiB5PSIxODgiIGZvbnQtc2l6ZT0iMTUiIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiM5NjU0MUIiPlN1YnJlZCBwcml2YWRhIDEwLjAuMi4wLzI0PC90ZXh0PgoKICA8cmVjdCB4PSI0MjQiIHk9IjIxNiIgd2lkdGg9IjE5NiIgaGVpZ2h0PSI1MiIgcng9IjYiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iI0U4ODczQSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iNTIyIiB5PSIyNDAiIGZvbnQtc2l6ZT0iMTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzIyMkIiPkVDMiAoYXBwKTwvdGV4dD4KICA8dGV4dCB4PSI1MjIiIHk9IjI1OCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+c2luIElQIHDDumJsaWNhPC90ZXh0PgoKICA8cmVjdCB4PSI0MjQiIHk9IjMwMCIgd2lkdGg9IjE5NiIgaGVpZ2h0PSI0OCIgcng9IjYiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzhDOTZBMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjUgNCIvPgogIDx0ZXh0IHg9IjUyMiIgeT0iMzMwIiBmb250LXNpemU9IjE0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNUI3Qzk5Ij5UYWJsYSBkZSBydXRhcyDihpIgPzwvdGV4dD4KCiAgPCEtLSBGbGVjaGFzIC0tPgogIDxkZWZzPgogICAgPG1hcmtlciBpZD0iZiIgbWFya2VyV2lkdGg9IjkiIG1hcmtlckhlaWdodD0iOSIgcmVmWD0iNyIgcmVmWT0iMy4yIiBvcmllbnQ9ImF1dG8iPgogICAgICA8cGF0aCBkPSJNMCwwIEw3LDMuMiBMMCw2LjQgeiIgZmlsbD0iIzVCN0M5OSIvPgogICAgPC9tYXJrZXI+CiAgPC9kZWZzPgogIDxsaW5lIHgxPSIyMDgiIHkxPSIyMTYiIHgyPSIyMDgiIHkyPSIxNTAiIHN0cm9rZT0iIzVCN0M5OSIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2YpIi8+CiAgPGxpbmUgeDE9IjIwOCIgeTE9IjE1MCIgeDI9IjI5NiIgeTI9IjEyNiIgc3Ryb2tlPSIjNUI3Qzk5IiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjZikiLz4KICA8bGluZSB4MT0iNDI0IiB5MT0iMjQyIiB4Mj0iMzEwIiB5Mj0iMjQyIiBzdHJva2U9IiM1QjdDOTkiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNiA0IiBtYXJrZXItZW5kPSJ1cmwoI2YpIi8+CiAgPHRleHQgeD0iMzY2IiB5PSIyMzQiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM1QjdDOTkiPnRyw6FmaWNvPC90ZXh0PgogIDx0ZXh0IHg9IjM2NiIgeT0iMjg0IiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNUI3Qzk5Ij5zYWxpZW50ZTwvdGV4dD4KPC9zdmc+Cg=="},{"id":"seg-02","dominio":"seguridad","enunciado":"Una aplicación en EC2 necesita leer objetos de un bucket S3. ¿Cuál es la forma recomendada de otorgar ese permiso?","opciones":["Guardar las claves de acceso de un usuario IAM en un archivo de configuración de la instancia","Asociar un rol IAM a la instancia mediante un perfil de instancia","Poner el bucket en acceso público de solo lectura","Crear un usuario IAM por instancia y rotar las claves con un cron"],"correctas":[1],"explicacion":"El rol IAM entrega credenciales temporales que se rotan solas a través del servicio de metadatos de la instancia. Nunca hay claves de larga duración escritas en disco. Guardar claves estáticas o abrir el bucket al público son antipatrones clásicos del examen.","referencia":"IAM · Roles para EC2"},{"id":"seg-03","dominio":"seguridad","enunciado":"Cumplimiento exige que los objetos de S3 se cifren en reposo, que la organización controle la política de la clave y que quede registro de cada uso de la clave en CloudTrail. ¿Qué opción cumple?","opciones":["SSE-S3 con claves gestionadas por Amazon S3","SSE-KMS con una clave gestionada por el cliente","Cifrado en el cliente con una clave guardada en Parameter Store","Solo forzar HTTPS en la política del bucket"],"correctas":[1],"explicacion":"Solo la clave gestionada por el cliente en KMS permite escribir una política de clave propia y auditar cada llamada de cifrado y descifrado en CloudTrail. SSE-S3 cifra, pero la clave la controla AWS. Forzar HTTPS protege el tráfico en tránsito, no el reposo.","referencia":"S3 · SSE-KMS"},{"id":"seg-04","dominio":"seguridad","enunciado":"¿Qué afirmaciones sobre grupos de seguridad y ACL de red son correctas? Selecciona dos.","opciones":["El grupo de seguridad tiene estado: si permites la entrada, la respuesta sale automáticamente","La ACL de red no tiene estado: necesita reglas de entrada y de salida por separado","El grupo de seguridad admite reglas de denegación explícita","La ACL de red se asocia a una interfaz de red, no a una subred"],"correctas":[0,1],"explicacion":"El grupo de seguridad es stateful y solo admite reglas de permitir; se asocia a interfaces de red. La ACL de red es stateless, admite permitir y denegar, se evalúa por número de regla y se asocia a la subred completa.","referencia":"VPC · Grupos de seguridad y NACL"},{"id":"res-01","dominio":"resiliencia","enunciado":"Observa el despliegue. La base de datos está configurada como Multi-AZ. El equipo quiere descargar las consultas de lectura de la primaria hacia la instancia en espera. ¿Qué responderías?","imagen":"alta-disponibilidad.svg","opciones":["Es posible activando lecturas en la instancia en espera desde la consola","No es posible: la instancia en espera de Multi-AZ no atiende tráfico; hay que crear réplicas de lectura","Es posible si se apunta el ALB directamente a la instancia en espera","No es posible con RDS, hay que migrar a DynamoDB"],"correctas":[1],"explicacion":"En un despliegue Multi-AZ clásico la réplica síncrona existe solo para conmutación por error y permanece inaccesible. Para repartir lecturas se usan réplicas de lectura, que son asíncronas y sí aceptan conexiones. Es una distinción que el examen repite mucho: Multi-AZ es disponibilidad, réplica de lectura es escalabilidad.","referencia":"RDS · Multi-AZ vs réplicas de lectura","imagen_datos":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjAgNDYwIiBmb250LWZhbWlseT0iU2Vnb2UgVUksIFJvYm90bywgSGVsdmV0aWNhLCBBcmlhbCwgc2Fucy1zZXJpZiI+CiAgPHJlY3Qgd2lkdGg9IjcyMCIgaGVpZ2h0PSI0NjAiIGZpbGw9IiNmZmZmZmYiLz4KCiAgPHJlY3QgeD0iMTYiIHk9IjE2IiB3aWR0aD0iNjg4IiBoZWlnaHQ9IjQyOCIgcng9IjEwIiBmaWxsPSIjRjdGOUZCIiBzdHJva2U9IiMzRjZFQTYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNyA1Ii8+CiAgPHRleHQgeD0iMzQiIHk9IjQyIiBmb250LXNpemU9IjE3IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjM0Y2RUE2Ij5SZWdpw7NuIEFXUzwvdGV4dD4KCiAgPCEtLSBBTEIgLS0+CiAgPHJlY3QgeD0iMjU2IiB5PSI2MiIgd2lkdGg9IjIwOCIgaGVpZ2h0PSI0NiIgcng9IjYiIGZpbGw9IiNFREUzRjUiIHN0cm9rZT0iIzdCNEZBOCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iMzYwIiB5PSI5MSIgZm9udC1zaXplPSIxNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzRBMkU2NiI+QXBwbGljYXRpb24gTG9hZCBCYWxhbmNlcjwvdGV4dD4KCiAgPCEtLSBBWiBBIC0tPgogIDxyZWN0IHg9IjQ2IiB5PSIxNDAiIHdpZHRoPSIzMDAiIGhlaWdodD0iMjcwIiByeD0iOCIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjNUI3Qzk5IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjYgNCIvPgogIDx0ZXh0IHg9IjY0IiB5PSIxNjYiIGZvbnQtc2l6ZT0iMTUiIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiMxNzIyMkIiPlpvbmEgZGUgZGlzcG9uaWJpbGlkYWQgQTwvdGV4dD4KCiAgPHJlY3QgeD0iNzYiIHk9IjE4OCIgd2lkdGg9IjI0MCIgaGVpZ2h0PSI5MiIgcng9IjYiIGZpbGw9IiNGREYxRTciIHN0cm9rZT0iI0U4ODczQSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iMTk2IiB5PSIyMTIiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5NjU0MUIiPkF1dG8gU2NhbGluZyBncm91cDwvdGV4dD4KICA8cmVjdCB4PSI5OCIgeT0iMjI0IiB3aWR0aD0iODgiIGhlaWdodD0iNDIiIHJ4PSI1IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiNFODg3M0EiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iMTQyIiB5PSIyNTAiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzIyMkIiPkVDMjwvdGV4dD4KICA8cmVjdCB4PSIyMDYiIHk9IjIyNCIgd2lkdGg9Ijg4IiBoZWlnaHQ9IjQyIiByeD0iNSIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjRTg4NzNBIiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDx0ZXh0IHg9IjI1MCIgeT0iMjUwIiBmb250LXNpemU9IjE0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyMjJCIj5FQzI8L3RleHQ+CgogIDxyZWN0IHg9Ijc2IiB5PSIzMDgiIHdpZHRoPSIyNDAiIGhlaWdodD0iNzIiIHJ4PSI2IiBmaWxsPSIjRTlFRkY3IiBzdHJva2U9IiMzRjZFQTYiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjE5NiIgeT0iMzM2IiBmb250LXNpemU9IjE1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyMjJCIj5SRFMgcHJpbWFyaWE8L3RleHQ+CiAgPHRleHQgeD0iMTk2IiB5PSIzNTgiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM1QjdDOTkiPmxlY3R1cmFzIHkgZXNjcml0dXJhczwvdGV4dD4KCiAgPCEtLSBBWiBCIC0tPgogIDxyZWN0IHg9IjM3NCIgeT0iMTQwIiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjI3MCIgcng9IjgiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzVCN0M5OSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI2IDQiLz4KICA8dGV4dCB4PSIzOTIiIHk9IjE2NiIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjYwMCIgZmlsbD0iIzE3MjIyQiI+Wm9uYSBkZSBkaXNwb25pYmlsaWRhZCBCPC90ZXh0PgoKICA8cmVjdCB4PSI0MDQiIHk9IjE4OCIgd2lkdGg9IjI0MCIgaGVpZ2h0PSI5MiIgcng9IjYiIGZpbGw9IiNGREYxRTciIHN0cm9rZT0iI0U4ODczQSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iNTI0IiB5PSIyMTIiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5NjU0MUIiPkF1dG8gU2NhbGluZyBncm91cDwvdGV4dD4KICA8cmVjdCB4PSI0MjYiIHk9IjIyNCIgd2lkdGg9Ijg4IiBoZWlnaHQ9IjQyIiByeD0iNSIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjRTg4NzNBIiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDx0ZXh0IHg9IjQ3MCIgeT0iMjUwIiBmb250LXNpemU9IjE0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyMjJCIj5FQzI8L3RleHQ+CiAgPHJlY3QgeD0iNTM0IiB5PSIyMjQiIHdpZHRoPSI4OCIgaGVpZ2h0PSI0MiIgcng9IjUiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iI0U4ODczQSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8dGV4dCB4PSI1NzgiIHk9IjI1MCIgZm9udC1zaXplPSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MjIyQiI+RUMyPC90ZXh0PgoKICA8cmVjdCB4PSI0MDQiIHk9IjMwOCIgd2lkdGg9IjI0MCIgaGVpZ2h0PSI3MiIgcng9IjYiIGZpbGw9IiNGMkY0RjYiIHN0cm9rZT0iIzhDOTZBMCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI1IDQiLz4KICA8dGV4dCB4PSI1MjQiIHk9IjMzNiIgZm9udC1zaXplPSIxNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE3MjIyQiI+UkRTIGVuIGVzcGVyYTwvdGV4dD4KICA8dGV4dCB4PSI1MjQiIHk9IjM1OCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+csOpcGxpY2Egc8OtbmNyb25hPC90ZXh0PgoKICA8ZGVmcz4KICAgIDxtYXJrZXIgaWQ9ImciIG1hcmtlcldpZHRoPSI5IiBtYXJrZXJIZWlnaHQ9IjkiIHJlZlg9IjciIHJlZlk9IjMuMiIgb3JpZW50PSJhdXRvIj4KICAgICAgPHBhdGggZD0iTTAsMCBMNywzLjIgTDAsNi40IHoiIGZpbGw9IiM1QjdDOTkiLz4KICAgIDwvbWFya2VyPgogIDwvZGVmcz4KICA8bGluZSB4MT0iMzAwIiB5MT0iMTA4IiB4Mj0iMTk2IiB5Mj0iMTg0IiBzdHJva2U9IiM1QjdDOTkiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNnKSIvPgogIDxsaW5lIHgxPSI0MjAiIHkxPSIxMDgiIHgyPSI1MjQiIHkyPSIxODQiIHN0cm9rZT0iIzVCN0M5OSIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2cpIi8+CiAgPGxpbmUgeDE9IjMxNiIgeTE9IjM0NCIgeDI9IjQwMCIgeTI9IjM0NCIgc3Ryb2tlPSIjNUI3Qzk5IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjYgNCIgbWFya2VyLWVuZD0idXJsKCNnKSIvPgo8L3N2Zz4K"},{"id":"res-02","dominio":"resiliencia","enunciado":"Un servicio productor genera pedidos más rápido de lo que el consumidor puede procesarlos, y algunos mensajes fallan de forma repetida. ¿Qué diseño aísla el problema?","opciones":["Llamar al consumidor de forma síncrona con reintentos exponenciales","Publicar en un tema de SNS con suscripción HTTP","Encolar en SQS y configurar una cola de mensajes fallidos","Escribir en un archivo compartido en EFS y procesarlo por lotes"],"correctas":[2],"explicacion":"SQS desacopla los ritmos de productor y consumidor y absorbe los picos. La cola de mensajes fallidos recoge lo que supera el número máximo de recepciones, evitando que un mensaje envenenado bloquee el procesamiento. SNS distribuye, pero no amortigua ni reintenta con la misma garantía.","referencia":"SQS · Dead-letter queue"},{"id":"res-03","dominio":"resiliencia","enunciado":"Una empresa necesita recuperarse en una segunda región con un RPO de segundos y un RTO de pocos minutos, pero sin pagar una copia completa a plena capacidad todo el tiempo. ¿Qué estrategia encaja?","opciones":["Copia de seguridad y restauración","Piloto encendido (pilot light)","Espera activa reducida (warm standby)","Activo-activo multirregión"],"correctas":[2],"explicacion":"La espera activa reducida mantiene una copia funcional del entorno, más pequeña, con datos replicándose de forma continua; al fallar la región primaria solo hay que escalarla. El piloto encendido tiene los datos replicados pero la capa de cómputo apagada, lo que alarga el RTO. Activo-activo cumple, pero es la opción más cara.","referencia":"Estrategias de recuperación ante desastres"},{"id":"res-04","dominio":"resiliencia","enunciado":"El grupo de Auto Scaling reemplaza instancias sanas de forma intermitente y los usuarios ven errores. La aplicación tarda cerca de cinco minutos en arrancar. ¿Qué ajuste es el más probable?","opciones":["Aumentar la capacidad máxima del grupo","Configurar un periodo de calentamiento de la comprobación de estado acorde al arranque","Cambiar el tipo de instancia a uno con más memoria","Desactivar las comprobaciones de estado del balanceador"],"correctas":[1],"explicacion":"Si la comprobación de estado empieza a evaluar antes de que la aplicación termine de arrancar, el grupo marca la instancia como no sana y la termina, entrando en un ciclo. El periodo de calentamiento le da margen. Desactivar la comprobación oculta el fallo en vez de resolverlo.","referencia":"Auto Scaling · Health check grace period"},{"id":"ren-01","dominio":"rendimiento","enunciado":"El sitio sirve imágenes y archivos estáticos desde el bucket de la región us-east-1. Usuarios de tres continentes reportan lentitud. Según el diagrama, ¿qué configuración resuelve la latencia sin exponer el bucket?","imagen":"cloudfront-s3.svg","opciones":["Habilitar el alojamiento de sitio estático y hacer público el bucket","Replicar el bucket en cada región y repartir con Route 53","Poner CloudFront delante del bucket con control de acceso de origen","Aumentar el tipo de almacenamiento del bucket a S3 Express One Zone"],"correctas":[2],"explicacion":"CloudFront cachea los objetos en las ubicaciones de borde cercanas al usuario y solo consulta el origen cuando falla la caché. El control de acceso de origen deja que solo la distribución lea el bucket, así el bloqueo de acceso público sigue activo. Replicar buckets multiplica costo y complejidad para contenido estático.","referencia":"CloudFront · Origin Access Control","imagen_datos":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjAgNDAwIiBmb250LWZhbWlseT0iU2Vnb2UgVUksIFJvYm90bywgSGVsdmV0aWNhLCBBcmlhbCwgc2Fucy1zZXJpZiI+CiAgPHJlY3Qgd2lkdGg9IjcyMCIgaGVpZ2h0PSI0MDAiIGZpbGw9IiNmZmZmZmYiLz4KCiAgPCEtLSBVc3VhcmlvcyAtLT4KICA8dGV4dCB4PSI5MiIgeT0iNDAiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSI2MDAiIGZpbGw9IiMxNzIyMkIiPlVzdWFyaW9zPC90ZXh0PgogIDxyZWN0IHg9IjM0IiB5PSI2MCIgd2lkdGg9IjExNiIgaGVpZ2h0PSI0NiIgcng9IjYiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzVCN0M5OSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iOTIiIHk9Ijg5IiBmb250LXNpemU9IjE0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyMjJCIj5Tw6NvIFBhdWxvPC90ZXh0PgogIDxyZWN0IHg9IjM0IiB5PSIxNzYiIHdpZHRoPSIxMTYiIGhlaWdodD0iNDYiIHJ4PSI2IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiM1QjdDOTkiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjkyIiB5PSIyMDUiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxNzIyMkIiPk1hZHJpZDwvdGV4dD4KICA8cmVjdCB4PSIzNCIgeT0iMjkyIiB3aWR0aD0iMTE2IiBoZWlnaHQ9IjQ2IiByeD0iNiIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjNUI3Qzk5IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSI5MiIgeT0iMzIxIiBmb250LXNpemU9IjE0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMTcyMjJCIj5TaW5nYXB1cjwvdGV4dD4KCiAgPCEtLSBVYmljYWNpb25lcyBkZSBib3JkZSAtLT4KICA8cmVjdCB4PSIyMTIiIHk9IjQ2IiB3aWR0aD0iMTk2IiBoZWlnaHQ9IjMwNiIgcng9IjgiIGZpbGw9IiNGN0Y5RkIiIHN0cm9rZT0iIzdCNEZBOCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI3IDUiLz4KICA8dGV4dCB4PSIzMTAiIHk9IjcyIiBmb250LXNpemU9IjE1IiBmb250LXdlaWdodD0iNjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNEEyRTY2Ij5VYmljYWNpb25lcyBkZSBib3JkZTwvdGV4dD4KCiAgPHJlY3QgeD0iMjM4IiB5PSI5MiIgd2lkdGg9IjE0NCIgaGVpZ2h0PSI1MiIgcng9IjYiIGZpbGw9IiNFREUzRjUiIHN0cm9rZT0iIzdCNEZBOCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iMzEwIiB5PSIxMTYiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM0QTJFNjYiPkNhY2jDqSBkZSBib3JkZTwvdGV4dD4KICA8dGV4dCB4PSIzMTAiIHk9IjEzNCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+VFRMIGNvbmZpZ3VyYWJsZTwvdGV4dD4KCiAgPHJlY3QgeD0iMjM4IiB5PSIxNzYiIHdpZHRoPSIxNDQiIGhlaWdodD0iNTIiIHJ4PSI2IiBmaWxsPSIjRURFM0Y1IiBzdHJva2U9IiM3QjRGQTgiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjMxMCIgeT0iMjAwIiBmb250LXNpemU9IjE0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNEEyRTY2Ij5DYWNow6kgZGUgYm9yZGU8L3RleHQ+CiAgPHRleHQgeD0iMzEwIiB5PSIyMTgiIGZvbnQtc2l6ZT0iMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM1QjdDOTkiPlRUTCBjb25maWd1cmFibGU8L3RleHQ+CgogIDxyZWN0IHg9IjIzOCIgeT0iMjYwIiB3aWR0aD0iMTQ0IiBoZWlnaHQ9IjUyIiByeD0iNiIgZmlsbD0iI0VERTNGNSIgc3Ryb2tlPSIjN0I0RkE4IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSIzMTAiIHk9IjI4NCIgZm9udC1zaXplPSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzRBMkU2NiI+Q2FjaMOpIGRlIGJvcmRlPC90ZXh0PgogIDx0ZXh0IHg9IjMxMCIgeT0iMzAyIiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNUI3Qzk5Ij5UVEwgY29uZmlndXJhYmxlPC90ZXh0PgoKICA8IS0tIE9yaWdlbiAtLT4KICA8cmVjdCB4PSI0NzIiIHk9IjEyMCIgd2lkdGg9IjIxNiIgaGVpZ2h0PSIxNjAiIHJ4PSI4IiBmaWxsPSIjRjdGOUZCIiBzdHJva2U9IiMzRjZFQTYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNyA1Ii8+CiAgPHRleHQgeD0iNTgwIiB5PSIxNDYiIGZvbnQtc2l6ZT0iMTUiIGZvbnQtd2VpZ2h0PSI2MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMzRjZFQTYiPlJlZ2nDs24gdXMtZWFzdC0xPC90ZXh0PgoKICA8cmVjdCB4PSI1MDAiIHk9IjE2NiIgd2lkdGg9IjE2MCIgaGVpZ2h0PSI4NCIgcng9IjYiIGZpbGw9IiNFQUYzRUEiIHN0cm9rZT0iIzJFN0Q1QiIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iNTgwIiB5PSIxOTYiIGZvbnQtc2l6ZT0iMTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxRjVCNDEiPkJ1Y2tldCBTMzwvdGV4dD4KICA8dGV4dCB4PSI1ODAiIHk9IjIxOCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+b2JqZXRvcyBlc3TDoXRpY29zPC90ZXh0PgogIDx0ZXh0IHg9IjU4MCIgeT0iMjM4IiBmb250LXNpemU9IjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNUI3Qzk5Ij5hY2Nlc28gcMO6YmxpY28gYmxvcXVlYWRvPC90ZXh0PgoKICA8ZGVmcz4KICAgIDxtYXJrZXIgaWQ9ImgiIG1hcmtlcldpZHRoPSI5IiBtYXJrZXJIZWlnaHQ9IjkiIHJlZlg9IjciIHJlZlk9IjMuMiIgb3JpZW50PSJhdXRvIj4KICAgICAgPHBhdGggZD0iTTAsMCBMNywzLjIgTDAsNi40IHoiIGZpbGw9IiM1QjdDOTkiLz4KICAgIDwvbWFya2VyPgogIDwvZGVmcz4KICA8bGluZSB4MT0iMTUwIiB5MT0iODMiIHgyPSIyMzQiIHkyPSIxMTIiIHN0cm9rZT0iIzVCN0M5OSIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2gpIi8+CiAgPGxpbmUgeDE9IjE1MCIgeTE9IjE5OSIgeDI9IjIzNCIgeTI9IjE5OSIgc3Ryb2tlPSIjNUI3Qzk5IiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjaCkiLz4KICA8bGluZSB4MT0iMTUwIiB5MT0iMzE1IiB4Mj0iMjM0IiB5Mj0iMjg4IiBzdHJva2U9IiM1QjdDOTkiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNoKSIvPgoKICA8bGluZSB4MT0iMzgyIiB5MT0iMTE4IiB4Mj0iNDk2IiB5Mj0iMTc2IiBzdHJva2U9IiM1QjdDOTkiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNiA0IiBtYXJrZXItZW5kPSJ1cmwoI2gpIi8+CiAgPGxpbmUgeDE9IjM4MiIgeTE9IjIwMiIgeDI9IjQ5NiIgeTI9IjIwMiIgc3Ryb2tlPSIjNUI3Qzk5IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjYgNCIgbWFya2VyLWVuZD0idXJsKCNoKSIvPgogIDxsaW5lIHgxPSIzODIiIHkxPSIyODYiIHgyPSI0OTYiIHkyPSIyNDQiIHN0cm9rZT0iIzVCN0M5OSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI2IDQiIG1hcmtlci1lbmQ9InVybCgjaCkiLz4KICA8dGV4dCB4PSI0MzgiIHk9IjMzMCIgZm9udC1zaXplPSIxMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzVCN0M5OSI+c29sbyBzaSBmYWxsYSBsYSBjYWNow6k8L3RleHQ+Cjwvc3ZnPgo="},{"id":"ren-02","dominio":"rendimiento","enunciado":"Una aplicación de lectura intensiva repite las mismas consultas contra RDS y la CPU de la base se mantiene por encima del 90 %. ¿Qué agregas primero?","opciones":["ElastiCache delante de la base para servir los resultados repetidos","Un volumen EBS io2 con más IOPS","Una tabla de DynamoDB en paralelo","Un balanceador de carga de red frente a la base"],"correctas":[0],"explicacion":"Una caché en memoria elimina las consultas repetidas antes de que lleguen a la base, que es exactamente el patrón descrito. Subir las IOPS ayuda si el cuello es de disco, no de CPU por consultas repetidas.","referencia":"ElastiCache · Patrón cache-aside"},{"id":"ren-03","dominio":"rendimiento","enunciado":"Varias instancias EC2 en distintas zonas de disponibilidad deben leer y escribir sobre el mismo conjunto de archivos con semántica de sistema de archivos POSIX. ¿Qué almacenamiento corresponde?","opciones":["Un volumen EBS conectado a la primera instancia y compartido por NFS","Amazon EFS","Un bucket S3 montado como unidad de red","Almacén de instancia local en cada EC2"],"correctas":[1],"explicacion":"EFS es un sistema de archivos NFS gestionado, accesible simultáneamente desde varias zonas de disponibilidad. Un volumen EBS vive en una sola zona y S3 es almacenamiento de objetos, sin semántica POSIX real.","referencia":"EFS · Almacenamiento compartido"},{"id":"ren-04","dominio":"rendimiento","enunciado":"¿Qué opciones reducen la latencia percibida por usuarios lejanos de la región donde vive la aplicación? Selecciona dos.","opciones":["Distribuir el contenido con CloudFront","Usar AWS Global Accelerator para el tráfico TCP y UDP","Aumentar el tamaño de la instancia de la base de datos","Cambiar el volumen raíz a un tipo gp3"],"correctas":[0,1],"explicacion":"CloudFront acerca el contenido cacheable al usuario y Global Accelerator lleva el tráfico a la red troncal de AWS desde la ubicación de borde más cercana, útil para aplicaciones no cacheables. Escalar la base o cambiar el volumen mejora el procesamiento, no la distancia de red.","referencia":"CloudFront y Global Accelerator"},{"id":"cos-01","dominio":"costos","enunciado":"Una carga de trabajo de producción se ejecuta 24/7 con demanda estable y la empresa puede comprometerse a tres años. ¿Qué modelo de precio minimiza el costo?","opciones":["Instancias bajo demanda","Instancias de spot","Savings Plans o instancias reservadas a tres años","Hosts dedicados"],"correctas":[2],"explicacion":"El compromiso de uso a uno o tres años es lo que desbloquea los mayores descuentos frente a bajo demanda. Spot es más barato aún, pero AWS puede reclamar la capacidad con dos minutos de aviso, así que no encaja con producción estable e ininterrumpida.","referencia":"Savings Plans e instancias reservadas"},{"id":"cos-02","dominio":"costos","enunciado":"Un procesamiento por lotes de análisis de video puede reiniciarse sin problema si se interrumpe y no tiene hora fija de entrega. ¿Qué opción de cómputo conviene?","opciones":["Instancias de spot","Instancias reservadas convertibles","Hosts dedicados","Instancias bajo demanda con Auto Scaling"],"correctas":[0],"explicacion":"La tolerancia a interrupciones y la ausencia de un plazo rígido son las dos señales que el examen usa para spot, con ahorros de hasta el 90 % frente a bajo demanda. Diseña el trabajo para guardar puntos de control y reanudar.","referencia":"EC2 · Instancias de spot"},{"id":"cos-03","dominio":"costos","enunciado":"Registros de auditoría deben conservarse siete años. Casi nunca se consultan y, cuando se piden, una recuperación en hasta doce horas es aceptable. ¿Qué clase de almacenamiento elegir?","opciones":["S3 Standard-Infrequent Access","S3 Glacier Instant Retrieval","S3 Glacier Deep Archive","S3 Intelligent-Tiering en el nivel de acceso frecuente"],"correctas":[2],"explicacion":"Deep Archive es la clase de menor costo por gigabyte y está pensada justamente para retención legal de años con acceso rarísimo; sus recuperaciones se miden en horas, lo que aquí es aceptable. Glacier Instant Retrieval cuesta más porque garantiza acceso en milisegundos.","referencia":"S3 · Clases de almacenamiento"},{"id":"cos-04","dominio":"costos","enunciado":"El equipo detecta un gasto alto en transferencia de datos: instancias EC2 en subredes privadas llaman a S3 en la misma región pasando por un NAT Gateway. ¿Qué cambio reduce el costo?","opciones":["Crear un endpoint de VPC de tipo gateway para S3","Aumentar el tamaño del NAT Gateway","Mover las instancias a la subred pública con IP elástica","Habilitar el cifrado en tránsito hacia S3"],"correctas":[0],"explicacion":"El endpoint de gateway para S3 enruta el tráfico por la red de AWS sin pasar por el NAT Gateway y no cobra por hora ni por gigabyte procesado. Es una de las optimizaciones de costo más repetidas del examen. Mover las instancias a la subred pública resolvería el cobro, pero rompe la postura de seguridad.","referencia":"VPC · Endpoints de gateway"}]};
+
+/* ---------------- utilidades ---------------- */
+const $ = (id) => document.getElementById(id);
+const LETRAS = ["A", "B", "C", "D", "E", "F"];
+const CLAVE = "repaso-aws:" + (BANCO.certificacion || "generico");
+const UMBRAL = Number(BANCO.umbral) || 70;
+
+function barajar(lista) {
+  const copia = lista.slice();
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copia[i], copia[j]] = [copia[j], copia[i]];
+  }
+  return copia;
+}
+
+function leerHistorial() {
+  try {
+    return JSON.parse(localStorage.getItem(CLAVE)) || { falladas: [], sesiones: [] };
+  } catch (e) {
+    return { falladas: [], sesiones: [] };
+  }
+}
+
+function guardarHistorial(datos) {
+  try { localStorage.setItem(CLAVE, JSON.stringify(datos)); } catch (e) { /* modo privado */ }
+}
+
+function nombreDominio(id) {
+  const d = (BANCO.dominios || []).find((x) => x.id === id);
+  return d ? d.nombre : id;
+}
+
+function mismasRespuestas(a, b) {
+  if (a.length !== b.length) return false;
+  const x = a.slice().sort(), y = b.slice().sort();
+  return x.every((v, i) => v === y[i]);
+}
+
+/* ---------------- estado ---------------- */
+let dominiosElegidos = new Set();
+let modo = "estudio";
+let sesion = null;
+
+/* ---------------- portada ---------------- */
+function pintarPortada() {
+  $("sello-cert").textContent = BANCO.certificacion || "";
+  $("titulo-cert").textContent = BANCO.titulo || "Repaso";
+  $("desc-cert").textContent = BANCO.descripcion || "";
+
+  const cont = $("chips-dominios");
+  cont.innerHTML = "";
+  (BANCO.dominios || []).forEach((d) => {
+    const total = BANCO.preguntas.filter((p) => p.dominio === d.id).length;
+    const b = document.createElement("button");
+    b.className = "chip";
+    b.setAttribute("aria-pressed", "true");
+    b.dataset.dominio = d.id;
+    b.innerHTML = d.nombre + '<span class="n">' + total + "</span>";
+    b.addEventListener("click", () => {
+      const activo = b.getAttribute("aria-pressed") === "true";
+      b.setAttribute("aria-pressed", activo ? "false" : "true");
+      if (activo) dominiosElegidos.delete(d.id); else dominiosElegidos.add(d.id);
+      refrescarPortada();
+    });
+    dominiosElegidos.add(d.id);
+    cont.appendChild(b);
+  });
+
+  document.querySelectorAll(".modo").forEach((b) => {
+    b.addEventListener("click", () => {
+      modo = b.dataset.modo;
+      document.querySelectorAll(".modo").forEach((o) =>
+        o.setAttribute("aria-pressed", o === b ? "true" : "false"));
+    });
+  });
+
+  $("cuantas").addEventListener("input", (e) => { $("cuantas-valor").textContent = e.target.value; });
+  refrescarPortada();
+}
+
+function disponibles() {
+  return BANCO.preguntas.filter((p) => dominiosElegidos.has(p.dominio));
+}
+
+function refrescarPortada() {
+  const n = disponibles().length;
+  const rango = $("cuantas");
+  rango.max = Math.max(5, n);
+  if (Number(rango.value) > n) { rango.value = n; }
+  $("cuantas-valor").textContent = rango.value;
+  $("btn-empezar").disabled = n === 0;
+  $("btn-empezar").textContent = n === 0 ? "Elige al menos un dominio" : "Empezar";
+
+  const hist = leerHistorial();
+  const pendientes = hist.falladas.filter((id) => BANCO.preguntas.some((p) => p.id === id));
+  $("btn-falladas").classList.toggle("oculto", pendientes.length === 0);
+  $("btn-falladas").textContent = "Repasar las " + pendientes.length + " que fallé";
+
+  if (hist.sesiones.length) {
+    const u = hist.sesiones[hist.sesiones.length - 1];
+    $("nota-historial").textContent =
+      "Última sesión: " + u.aciertos + " de " + u.total + " (" + u.fecha + ").";
+  } else {
+    $("nota-historial").textContent = "";
+  }
+}
+
+/* ---------------- sesión ---------------- */
+function iniciarSesion(preguntas, etiqueta, modoSesion) {
+  if (!preguntas.length) return;
+  sesion = {
+    modo: modoSesion,
+    etiqueta: etiqueta,
+    indice: 0,
+    revisando: false,
+    items: preguntas.map((p) => {
+      const orden = barajar(p.opciones.map((_, i) => i));
+      return {
+        p: p,
+        orden: orden,
+        correctas: orden.reduce((acc, original, nuevo) => {
+          if (p.correctas.includes(original)) acc.push(nuevo);
+          return acc;
+        }, []),
+        elegidas: [],
+        respondida: false
+      };
+    }),
+    fin: modoSesion === "examen" ? Date.now() + preguntas.length * 120000 : null
+  };
+  mostrar("pantalla-pregunta");
+  $("titulo-sesion").textContent = etiqueta;
+  $("reloj").classList.toggle("oculto", modoSesion !== "examen");
+  if (modoSesion === "examen") arrancarReloj();
+  pintarPregunta();
+}
+
+let temporizador = null;
+function arrancarReloj() {
+  clearInterval(temporizador);
+  const tic = () => {
+    const resto = Math.max(0, sesion.fin - Date.now());
+    const m = Math.floor(resto / 60000), s = Math.floor((resto % 60000) / 1000);
+    $("reloj").textContent = "Tiempo restante " + m + ":" + String(s).padStart(2, "0");
+    $("reloj").classList.toggle("urgente", resto < 120000);
+    if (resto === 0) { clearInterval(temporizador); terminar(); }
+  };
+  tic();
+  temporizador = setInterval(tic, 1000);
+}
+
+function pintarPregunta() {
+  const it = sesion.items[sesion.indice];
+  const p = it.p;
+  const multiple = p.correctas.length > 1;
+
+  $("contador").textContent = (sesion.indice + 1) + " / " + sesion.items.length;
+  $("barra-progreso").style.width =
+    ((sesion.indice) / sesion.items.length * 100) + "%";
+  $("etiqueta-dominio").textContent = nombreDominio(p.dominio);
+  $("enunciado").textContent = p.enunciado;
+  $("aviso-multiple").classList.toggle("oculto", !multiple);
+
+  if (p.imagen_datos) {
+    $("diagrama").src = p.imagen_datos;
+    $("marco-diagrama").classList.remove("oculto");
+  } else {
+    $("marco-diagrama").classList.add("oculto");
+  }
+
+  const cont = $("opciones");
+  cont.innerHTML = "";
+  it.orden.forEach((original, nuevo) => {
+    const b = document.createElement("button");
+    b.className = "opcion";
+    b.setAttribute("aria-pressed", it.elegidas.includes(nuevo) ? "true" : "false");
+    b.innerHTML = '<span class="letra">' + LETRAS[nuevo] + "</span><span></span>";
+    b.lastChild.textContent = p.opciones[original];
+    b.addEventListener("click", () => alternar(nuevo, multiple));
+    cont.appendChild(b);
+  });
+
+  $("zona-explicacion").innerHTML = "";
+  if (it.respondida) mostrarCorreccion();
+  else actualizarBoton();
+  window.scrollTo({ top: 0 });
+}
+
+function alternar(indice, multiple) {
+  const it = sesion.items[sesion.indice];
+  if (it.respondida) return;
+  if (multiple) {
+    const pos = it.elegidas.indexOf(indice);
+    if (pos >= 0) it.elegidas.splice(pos, 1); else it.elegidas.push(indice);
+  } else {
+    it.elegidas = [indice];
+  }
+  document.querySelectorAll("#opciones .opcion").forEach((b, i) =>
+    b.setAttribute("aria-pressed", it.elegidas.includes(i) ? "true" : "false"));
+  actualizarBoton();
+}
+
+function actualizarBoton() {
+  const it = sesion.items[sesion.indice];
+  const btn = $("btn-accion");
+  const ultima = sesion.indice === sesion.items.length - 1;
+
+  if (sesion.revisando) {
+    btn.disabled = false;
+    btn.textContent = ultima ? "Volver al resultado" : "Siguiente";
+    return;
+  }
+  if (sesion.modo === "examen") {
+    btn.disabled = it.elegidas.length === 0;
+    btn.textContent = ultima ? "Terminar" : "Siguiente";
+    return;
+  }
+  if (it.respondida) {
+    btn.disabled = false;
+    btn.textContent = ultima ? "Ver resultado" : "Siguiente";
+  } else {
+    btn.disabled = it.elegidas.length === 0;
+    btn.textContent = "Comprobar";
+  }
+}
+
+function mostrarCorreccion() {
+  const it = sesion.items[sesion.indice];
+  const acerto = mismasRespuestas(it.elegidas, it.correctas);
+
+  document.querySelectorAll("#opciones .opcion").forEach((b, i) => {
+    b.disabled = true;
+    b.setAttribute("aria-pressed", "false");
+    if (it.correctas.includes(i)) b.dataset.estado = "ok";
+    else if (it.elegidas.includes(i)) b.dataset.estado = "mal";
+  });
+
+  const caja = document.createElement("div");
+  caja.className = "explicacion" + (acerto ? "" : " fallo");
+  const veredicto = document.createElement("p");
+  veredicto.className = "veredicto";
+  veredicto.textContent = acerto ? "Correcto" : "No es esa";
+  const texto = document.createElement("p");
+  texto.textContent = it.p.explicacion || "";
+  caja.appendChild(veredicto);
+  caja.appendChild(texto);
+  if (it.p.referencia) {
+    const ref = document.createElement("span");
+    ref.className = "ref";
+    ref.textContent = it.p.referencia;
+    caja.appendChild(ref);
+  }
+  $("zona-explicacion").innerHTML = "";
+  $("zona-explicacion").appendChild(caja);
+  actualizarBoton();
+}
+
+function accion() {
+  const it = sesion.items[sesion.indice];
+  const ultima = sesion.indice === sesion.items.length - 1;
+
+  if (!sesion.revisando && sesion.modo === "estudio" && !it.respondida) {
+    it.respondida = true;
+    mostrarCorreccion();
+    return;
+  }
+  if (!sesion.revisando && sesion.modo === "examen") it.respondida = true;
+
+  if (ultima) {
+    if (sesion.revisando) { sesion.revisando = false; mostrar("pantalla-resultado"); }
+    else terminar();
+    return;
+  }
+  sesion.indice++;
+  pintarPregunta();
+}
+
+/* ---------------- resultado ---------------- */
+function terminar() {
+  clearInterval(temporizador);
+  const total = sesion.items.length;
+  const aciertos = sesion.items.filter((it) => mismasRespuestas(it.elegidas, it.correctas)).length;
+  const pct = Math.round(aciertos / total * 100);
+
+  $("cifra-puntaje").innerHTML = pct + "<small>%</small>";
+  $("frase-puntaje").textContent = aciertos + " de " + total + " correctas";
+  $("umbral").textContent = (pct >= UMBRAL ? "Por encima" : "Por debajo") +
+    " del " + UMBRAL + " % orientativo de aprobación";
+
+  const porDominio = {};
+  sesion.items.forEach((it) => {
+    const d = it.p.dominio;
+    porDominio[d] = porDominio[d] || { ok: 0, n: 0 };
+    porDominio[d].n++;
+    if (mismasRespuestas(it.elegidas, it.correctas)) porDominio[d].ok++;
+  });
+
+  const cont = $("desglose-dominios");
+  cont.innerHTML = "";
+  Object.keys(porDominio).forEach((d) => {
+    const { ok, n } = porDominio[d];
+    const p = Math.round(ok / n * 100);
+    const div = document.createElement("div");
+    div.className = "dominio";
+    div.innerHTML =
+      '<div class="fila"><span></span><span>' + ok + "/" + n + "</span></div>" +
+      '<div class="riel"><i style="width:' + p + '%"></i></div>';
+    div.querySelector(".fila span").textContent = nombreDominio(d);
+    const barra = div.querySelector(".riel i");
+    barra.className = p >= UMBRAL ? "alto" : (p < 50 ? "bajo" : "");
+    cont.appendChild(div);
+  });
+
+  const hist = leerHistorial();
+  const falladas = new Set(hist.falladas);
+  sesion.items.forEach((it) => {
+    if (mismasRespuestas(it.elegidas, it.correctas)) falladas.delete(it.p.id);
+    else falladas.add(it.p.id);
+  });
+  hist.falladas = Array.from(falladas);
+  hist.sesiones.push({
+    fecha: new Date().toLocaleDateString("es-CO"),
+    aciertos: aciertos, total: total, modo: sesion.modo
+  });
+  hist.sesiones = hist.sesiones.slice(-20);
+  guardarHistorial(hist);
+
+  mostrar("pantalla-resultado");
+}
+
+/* ---------------- visor ---------------- */
+let escala = 1;
+function aplicarEscala() { $("img-visor").style.width = (100 * escala) + "%"; }
+
+function abrirVisor(src) {
+  $("img-visor").src = src;
+  escala = 1;
+  aplicarEscala();
+  $("visor").classList.remove("oculto");
+  document.body.style.overflow = "hidden";
+}
+function cerrarVisor() {
+  $("visor").classList.add("oculto");
+  document.body.style.overflow = "";
+}
+
+/* ---------------- navegación ---------------- */
+function mostrar(id) {
+  ["pantalla-inicio", "pantalla-pregunta", "pantalla-resultado"]
+    .forEach((s) => $(s).classList.toggle("oculto", s !== id));
+  window.scrollTo({ top: 0 });
+}
+
+function volverInicio() {
+  clearInterval(temporizador);
+  sesion = null;
+  refrescarPortada();
+  mostrar("pantalla-inicio");
+}
+
+/* ---------------- arranque ---------------- */
+pintarPortada();
+
+$("btn-empezar").addEventListener("click", () => {
+  const n = Number($("cuantas").value);
+  const elegidas = barajar(disponibles()).slice(0, n);
+  const etiqueta = modo === "examen" ? "Examen cronometrado" : "Sesión de estudio";
+  iniciarSesion(elegidas, etiqueta, modo);
+});
+
+$("btn-falladas").addEventListener("click", () => {
+  const hist = leerHistorial();
+  const preguntas = BANCO.preguntas.filter((p) => hist.falladas.includes(p.id));
+  iniciarSesion(barajar(preguntas), "Repaso de falladas", "estudio");
+});
+
+$("btn-accion").addEventListener("click", accion);
+$("btn-salir").addEventListener("click", volverInicio);
+$("btn-inicio").addEventListener("click", volverInicio);
+$("btn-otra").addEventListener("click", volverInicio);
+
+$("btn-revisar").addEventListener("click", () => {
+  sesion.revisando = true;
+  sesion.indice = 0;
+  sesion.items.forEach((it) => { it.respondida = true; });
+  mostrar("pantalla-pregunta");
+  pintarPregunta();
+});
+
+$("btn-ampliar").addEventListener("click", () => abrirVisor($("diagrama").src));
+$("diagrama").addEventListener("click", () => abrirVisor($("diagrama").src));
+$("cerrar-visor").addEventListener("click", cerrarVisor);
+$("zoom-mas").addEventListener("click", () => { escala = Math.min(escala * 1.4, 6); aplicarEscala(); });
+$("zoom-menos").addEventListener("click", () => { escala = Math.max(escala / 1.4, 1); aplicarEscala(); });
+$("zoom-ajustar").addEventListener("click", () => { escala = 1; aplicarEscala(); });
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !$("visor").classList.contains("oculto")) cerrarVisor();
+});
+</script>
+</body>
+</html>

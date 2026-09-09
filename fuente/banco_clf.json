@@ -1,0 +1,597 @@
+{
+  "certificacion": "CLF-C02",
+  "titulo": "AWS Cloud Practitioner",
+  "descripcion": "Repaso del curso Cloud Practitioner Essentials, con el reparto de dominios del examen real.",
+  "umbral": 70,
+  "dominios": [
+    { "id": "conceptos", "nombre": "Conceptos de la nube", "peso": 24 },
+    { "id": "seguridad", "nombre": "Seguridad y cumplimiento", "peso": 30 },
+    { "id": "tecnologia", "nombre": "Tecnología y servicios", "peso": 34 },
+    { "id": "facturacion", "nombre": "Facturación, precios y soporte", "peso": 12 }
+  ],
+  "preguntas": [
+    {
+      "id": "con-01",
+      "dominio": "conceptos",
+      "enunciado": "Una empresa migra de su propio centro de datos a AWS. ¿Qué cambio describe mejor el efecto sobre sus gastos?",
+      "opciones": [
+        "Pasa de gasto variable a gasto de capital anticipado",
+        "Pasa de gasto de capital anticipado a gasto variable según el consumo",
+        "Elimina por completo cualquier gasto en tecnología",
+        "Convierte los gastos operativos en inversión en hardware"
+      ],
+      "correctas": [1],
+      "explicacion": "Antes había que comprar servidores por adelantado sin saber cuánto se usarían: eso es gasto de capital. En la nube pagas por lo que consumes, cuando lo consumes. Es una de las ventajas que el examen repite con distintas palabras.",
+      "referencia": "Conceptos · Beneficios de la nube"
+    },
+    {
+      "id": "con-02",
+      "dominio": "conceptos",
+      "enunciado": "AWS puede ofrecer precios más bajos que los que conseguiría una empresa comprando su propio hardware. ¿A qué beneficio corresponde?",
+      "opciones": [
+        "Economías de escala masivas",
+        "Alta disponibilidad",
+        "Tolerancia a fallos",
+        "Elasticidad"
+      ],
+      "correctas": [0],
+      "explicacion": "AWS agrega el consumo de cientos de miles de clientes, compra a un volumen enorme y traslada parte de ese ahorro al precio. Es un beneficio económico, no técnico.",
+      "referencia": "Conceptos · Economías de escala"
+    },
+    {
+      "id": "con-03",
+      "dominio": "conceptos",
+      "enunciado": "Un equipo necesitaba semanas para conseguir servidores de prueba y ahora los lanza en minutos. ¿Qué beneficio de la nube ilustra el caso?",
+      "opciones": [
+        "Agilidad y velocidad de aprovisionamiento",
+        "Cumplimiento normativo",
+        "Economías de escala",
+        "Facturación consolidada"
+      ],
+      "correctas": [0],
+      "explicacion": "Reducir el tiempo entre la idea y el recurso funcionando es agilidad. Permite experimentar barato: si la prueba falla, apagas los recursos y dejas de pagar.",
+      "referencia": "Conceptos · Agilidad"
+    },
+    {
+      "id": "con-04",
+      "dominio": "conceptos",
+      "enunciado": "¿Qué describe la elasticidad en AWS?",
+      "opciones": [
+        "Distribuir la aplicación en varias zonas de disponibilidad",
+        "Añadir y quitar capacidad automáticamente según la demanda del momento",
+        "Cifrar los datos en reposo y en tránsito",
+        "Guardar copias de seguridad en otra región"
+      ],
+      "correctas": [1],
+      "explicacion": "La elasticidad es el ajuste automático en ambas direcciones: crece en el pico y se reduce cuando baja la demanda, para que dejes de pagar capacidad ociosa. No confundir con alta disponibilidad, que es seguir funcionando ante un fallo.",
+      "referencia": "Conceptos · Elasticidad"
+    },
+    {
+      "id": "con-05",
+      "dominio": "conceptos",
+      "enunciado": "¿Cuál de estos NO es un pilar del AWS Well-Architected Framework?",
+      "opciones": [
+        "Excelencia operativa",
+        "Eficiencia del rendimiento",
+        "Sostenibilidad",
+        "Portabilidad entre proveedores"
+      ],
+      "correctas": [3],
+      "explicacion": "Los seis pilares son excelencia operativa, seguridad, fiabilidad, eficiencia del rendimiento, optimización de costos y sostenibilidad. La portabilidad entre proveedores no está entre ellos.",
+      "referencia": "Well-Architected Framework"
+    },
+    {
+      "id": "con-06",
+      "dominio": "conceptos",
+      "enunciado": "Una empresa mantiene su sistema contable en su propio centro de datos y ejecuta el sitio web en AWS, conectados entre sí. ¿Qué modelo de despliegue es?",
+      "opciones": [
+        "Nube pública",
+        "Nube híbrida",
+        "Local (on-premises)",
+        "Multinube"
+      ],
+      "correctas": [1],
+      "explicacion": "Combinar recursos en la nube con infraestructura propia conectada es un despliegue híbrido. Es habitual cuando una parte del sistema no se puede mover por normativa o por ser demasiado antigua.",
+      "referencia": "Conceptos · Modelos de despliegue"
+    },
+    {
+      "id": "con-07",
+      "dominio": "conceptos",
+      "enunciado": "Amazon EC2, donde tú eliges el sistema operativo, lo parchas y administras la instancia, ¿a qué modelo de servicio corresponde?",
+      "opciones": [
+        "Infraestructura como servicio (IaaS)",
+        "Plataforma como servicio (PaaS)",
+        "Software como servicio (SaaS)",
+        "Función como servicio"
+      ],
+      "correctas": [0],
+      "explicacion": "IaaS entrega los bloques básicos de cómputo, red y almacenamiento, y el control del sistema operativo queda en tus manos. Si AWS gestionara el sistema operativo y solo desplegaras código, sería PaaS.",
+      "referencia": "Conceptos · Modelos de servicio"
+    },
+    {
+      "id": "con-08",
+      "dominio": "conceptos",
+      "enunciado": "¿Qué principios de diseño en la nube recomienda AWS? Selecciona dos.",
+      "opciones": [
+        "Diseñar asumiendo que los componentes van a fallar",
+        "Desacoplar los componentes para que no dependan unos de otros",
+        "Concentrar toda la carga en una instancia grande para simplificar",
+        "Estimar la capacidad máxima al inicio y fijarla para todo el año"
+      ],
+      "correctas": [0, 1],
+      "explicacion": "Diseñar para el fallo y desacoplar son dos principios centrales. Los otros dos son justamente los hábitos del centro de datos tradicional que la nube busca eliminar: escalar verticalmente sin límite y adivinar la capacidad por adelantado.",
+      "referencia": "Conceptos · Principios de diseño"
+    },
+    {
+      "id": "con-09",
+      "dominio": "conceptos",
+      "enunciado": "Una startup quiere que su aplicación responda rápido a usuarios de Europa y Asia sin construir centros de datos allí. ¿Qué beneficio de la nube aprovecha?",
+      "opciones": [
+        "Alcance global en minutos",
+        "Facturación consolidada",
+        "Responsabilidad compartida",
+        "Reserva de capacidad a tres años"
+      ],
+      "correctas": [0],
+      "explicacion": "Desplegar en regiones cercanas al usuario, o distribuir contenido por las ubicaciones de borde, se hace en minutos y sin inversión previa. Es la ventaja de alcance global que el examen menciona como \"volverse global en minutos\".",
+      "referencia": "Conceptos · Alcance global"
+    },
+    {
+      "id": "con-10",
+      "dominio": "conceptos",
+      "enunciado": "¿Qué significa que en la nube dejas de \"adivinar la capacidad\"?",
+      "opciones": [
+        "Que AWS decide automáticamente el presupuesto del proyecto",
+        "Que puedes ajustar los recursos hacia arriba o hacia abajo cuando cambie la demanda real",
+        "Que los recursos son gratuitos hasta cierto límite",
+        "Que ya no hace falta monitorear el rendimiento"
+      ],
+      "correctas": [1],
+      "explicacion": "En un centro de datos propio compras hardware basándote en una predicción: si te quedas corto, el servicio se degrada; si te pasas, pagaste de más. En la nube ajustas después, con datos reales de uso.",
+      "referencia": "Conceptos · Beneficios de la nube"
+    },
+
+    {
+      "id": "seg-01",
+      "dominio": "seguridad",
+      "enunciado": "Según el modelo de responsabilidad compartida del diagrama, ¿quién debe instalar los parches del sistema operativo de una instancia EC2?",
+      "imagen": "responsabilidad-compartida.svg",
+      "opciones": [
+        "AWS, como parte de la seguridad de la nube",
+        "El cliente, como parte de la seguridad en la nube",
+        "El proveedor del sistema operativo directamente",
+        "Nadie: las instancias EC2 se actualizan solas"
+      ],
+      "correctas": [1],
+      "explicacion": "En EC2 el sistema operativo invitado es del cliente: tú lo eliges, lo configuras y lo parchas. AWS parchea el hipervisor y la infraestructura que hay debajo, no lo que corre dentro de tu instancia.",
+      "referencia": "Modelo de responsabilidad compartida"
+    },
+    {
+      "id": "seg-02",
+      "dominio": "seguridad",
+      "enunciado": "¿De cuál de estas tareas se encarga AWS según el modelo de responsabilidad compartida?",
+      "imagen": "responsabilidad-compartida.svg",
+      "opciones": [
+        "Configurar los grupos de seguridad de tus instancias",
+        "Definir los permisos de los usuarios IAM",
+        "Proteger físicamente los centros de datos",
+        "Clasificar y cifrar los datos de tu aplicación"
+      ],
+      "correctas": [2],
+      "explicacion": "La seguridad física de las instalaciones, el hardware y la red física es responsabilidad exclusiva de AWS, y ni siquiera puedes acceder a ella. Todo lo que se configura desde la consola o la API es tuyo.",
+      "referencia": "Modelo de responsabilidad compartida"
+    },
+    {
+      "id": "seg-03",
+      "dominio": "seguridad",
+      "enunciado": "Al usar Amazon RDS en lugar de instalar la base de datos en EC2, ¿qué responsabilidad se traslada a AWS?",
+      "opciones": [
+        "Los parches del sistema operativo subyacente y del motor de base de datos",
+        "La creación de los usuarios de la base de datos",
+        "El cifrado que decides aplicar a tus datos",
+        "Las reglas del grupo de seguridad que controla el acceso"
+      ],
+      "correctas": [0],
+      "explicacion": "Cuanto más gestionado es el servicio, más tareas asume AWS. Con RDS deja de ser tuyo el mantenimiento del sistema operativo y del motor, pero sigues decidiendo quién se conecta, con qué permisos y con qué cifrado.",
+      "referencia": "Responsabilidad compartida · Servicios gestionados"
+    },
+    {
+      "id": "seg-04",
+      "dominio": "seguridad",
+      "enunciado": "¿Cuál es la práctica recomendada respecto al usuario raíz de una cuenta AWS?",
+      "opciones": [
+        "Usarlo a diario porque tiene todos los permisos necesarios",
+        "Compartir sus credenciales con el equipo de operaciones",
+        "Activarle MFA, guardar sus credenciales y trabajar con usuarios o roles IAM",
+        "Eliminarlo después de crear el primer usuario IAM"
+      ],
+      "correctas": [2],
+      "explicacion": "El usuario raíz no se puede eliminar ni limitar con políticas, así que se protege con autenticación multifactor y se reserva para las pocas tareas que solo él puede hacer. El trabajo diario va con identidades de permisos acotados.",
+      "referencia": "IAM · Usuario raíz"
+    },
+    {
+      "id": "seg-05",
+      "dominio": "seguridad",
+      "enunciado": "Otorgar a cada identidad únicamente los permisos que necesita para su tarea, y nada más, se conoce como:",
+      "opciones": [
+        "Autenticación multifactor",
+        "Principio de mínimo privilegio",
+        "Responsabilidad compartida",
+        "Federación de identidades"
+      ],
+      "correctas": [1],
+      "explicacion": "Es el principio base de IAM. Se empieza sin permisos y se van agregando los estrictamente necesarios, en vez de dar acceso amplio y recortar después.",
+      "referencia": "IAM · Mínimo privilegio"
+    },
+    {
+      "id": "seg-06",
+      "dominio": "seguridad",
+      "enunciado": "Una aplicación que corre en EC2 necesita acceder a un bucket de S3. ¿Cuál es la forma recomendada?",
+      "opciones": [
+        "Crear un usuario IAM y copiar sus claves de acceso a la instancia",
+        "Asignar un rol IAM a la instancia",
+        "Hacer público el bucket",
+        "Usar las credenciales del usuario raíz"
+      ],
+      "correctas": [1],
+      "explicacion": "Los roles entregan credenciales temporales que se renuevan solas, así no hay claves guardadas en el servidor que alguien pueda robar. Es el patrón que el examen espera siempre que un servicio de AWS deba hablar con otro.",
+      "referencia": "IAM · Roles"
+    },
+    {
+      "id": "seg-07",
+      "dominio": "seguridad",
+      "enunciado": "Entran diez personas nuevas al equipo de desarrollo y todas necesitan los mismos permisos. ¿Cuál es la forma más eficiente de gestionarlo en IAM?",
+      "opciones": [
+        "Adjuntar la política a cada usuario por separado",
+        "Crear un grupo IAM con la política y agregar a los diez usuarios",
+        "Compartir un único usuario entre los diez",
+        "Darles acceso con el usuario raíz y revocarlo cada noche"
+      ],
+      "correctas": [1],
+      "explicacion": "El grupo IAM existe para eso: la política se mantiene en un solo lugar y todos los miembros la heredan. Compartir un usuario, además, impide saber quién hizo cada acción.",
+      "referencia": "IAM · Grupos"
+    },
+    {
+      "id": "seg-08",
+      "dominio": "seguridad",
+      "enunciado": "¿Qué servicio protege las aplicaciones frente a ataques de denegación de servicio distribuido?",
+      "opciones": [
+        "AWS Shield",
+        "Amazon Inspector",
+        "AWS Artifact",
+        "AWS Config"
+      ],
+      "correctas": [0],
+      "explicacion": "Shield Standard se aplica sin costo adicional a todos los clientes. Shield Advanced es de pago y agrega protección ante ataques mayores, métricas detalladas y acceso a un equipo de respuesta.",
+      "referencia": "AWS Shield"
+    },
+    {
+      "id": "seg-09",
+      "dominio": "seguridad",
+      "enunciado": "El equipo quiere filtrar solicitudes web maliciosas, como intentos de inyección SQL, antes de que lleguen a la aplicación. ¿Qué servicio usa?",
+      "opciones": [
+        "AWS WAF",
+        "Amazon GuardDuty",
+        "AWS KMS",
+        "Amazon Macie"
+      ],
+      "correctas": [0],
+      "explicacion": "AWS WAF es un firewall de aplicaciones web: inspecciona las solicitudes HTTP y bloquea las que coinciden con reglas que tú defines. GuardDuty detecta actividad sospechosa, pero no filtra tráfico.",
+      "referencia": "AWS WAF"
+    },
+    {
+      "id": "seg-10",
+      "dominio": "seguridad",
+      "enunciado": "¿Qué servicio analiza de forma continua registros y actividad de la cuenta para detectar comportamiento malicioso o no autorizado?",
+      "opciones": [
+        "Amazon GuardDuty",
+        "AWS Trusted Advisor",
+        "AWS Artifact",
+        "Amazon CloudFront"
+      ],
+      "correctas": [0],
+      "explicacion": "GuardDuty es el servicio de detección de amenazas: revisa fuentes como los registros de CloudTrail y de flujo de VPC y genera hallazgos. No requiere instalar agentes.",
+      "referencia": "Amazon GuardDuty"
+    },
+    {
+      "id": "seg-11",
+      "dominio": "seguridad",
+      "enunciado": "Una auditora pide los informes de cumplimiento de AWS, como SOC 2 e ISO 27001. ¿Dónde se descargan?",
+      "opciones": [
+        "AWS Artifact",
+        "AWS Config",
+        "AWS Trusted Advisor",
+        "Amazon Inspector"
+      ],
+      "correctas": [0],
+      "explicacion": "AWS Artifact es el repositorio de informes de auditoría y acuerdos de AWS, disponible bajo demanda desde la consola. Es una pregunta casi textual en el examen.",
+      "referencia": "AWS Artifact"
+    },
+    {
+      "id": "seg-12",
+      "dominio": "seguridad",
+      "enunciado": "¿Cuáles de estas tareas son responsabilidad del cliente? Selecciona dos.",
+      "opciones": [
+        "Configurar la autenticación multifactor de los usuarios",
+        "Retirar y destruir físicamente los discos dados de baja",
+        "Definir las reglas de los grupos de seguridad",
+        "Mantener la energía y la refrigeración de los centros de datos"
+      ],
+      "correctas": [0, 2],
+      "explicacion": "Las identidades y la configuración de red son del cliente. La destrucción de medios y las instalaciones físicas son de AWS: si la tarea implica tocar hardware, no es tuya.",
+      "referencia": "Modelo de responsabilidad compartida"
+    },
+
+    {
+      "id": "tec-01",
+      "dominio": "tecnologia",
+      "enunciado": "Según el diagrama, ¿qué es una zona de disponibilidad?",
+      "imagen": "regiones-az.svg",
+      "opciones": [
+        "Un único servidor dentro de una región",
+        "Uno o varios centros de datos aislados dentro de una región",
+        "Una copia completa de una región en otro continente",
+        "Un punto de caché para contenido estático"
+      ],
+      "correctas": [1],
+      "explicacion": "Cada zona de disponibilidad agrupa uno o más centros de datos con energía y red independientes, y está lo bastante lejos de las demás como para que un desastre local no las tumbe a todas, pero lo bastante cerca para replicar con baja latencia.",
+      "referencia": "Infraestructura global · Zonas de disponibilidad"
+    },
+    {
+      "id": "tec-02",
+      "dominio": "tecnologia",
+      "enunciado": "¿Qué factores se consideran al elegir una región de AWS? Selecciona dos.",
+      "imagen": "regiones-az.svg",
+      "opciones": [
+        "El cumplimiento normativo sobre dónde deben residir los datos",
+        "La cercanía a los usuarios para reducir la latencia",
+        "El idioma de la consola de administración",
+        "La cantidad de usuarios IAM de la cuenta"
+      ],
+      "correctas": [0, 1],
+      "explicacion": "Los cuatro criterios que enseña el curso son cumplimiento, latencia, disponibilidad del servicio en esa región y precio, que varía entre regiones. El idioma de la consola y el número de usuarios no dependen de la región.",
+      "referencia": "Infraestructura global · Elección de región"
+    },
+    {
+      "id": "tec-03",
+      "dominio": "tecnologia",
+      "enunciado": "¿Qué servicio entrega contenido desde las ubicaciones de borde para reducir la latencia de los usuarios?",
+      "imagen": "regiones-az.svg",
+      "opciones": [
+        "Amazon CloudFront",
+        "Amazon VPC",
+        "AWS Direct Connect",
+        "Amazon EBS"
+      ],
+      "correctas": [0],
+      "explicacion": "CloudFront es la red de entrega de contenido de AWS. Guarda copias en caché en las ubicaciones de borde, que son muchas más que las regiones, y sirve al usuario desde la más cercana.",
+      "referencia": "Amazon CloudFront"
+    },
+    {
+      "id": "tec-04",
+      "dominio": "tecnologia",
+      "enunciado": "Un equipo necesita ejecutar código sin aprovisionar ni administrar servidores, pagando solo por el tiempo de ejecución. ¿Qué servicio corresponde?",
+      "opciones": [
+        "Amazon EC2",
+        "AWS Lambda",
+        "Amazon Lightsail",
+        "AWS Batch"
+      ],
+      "correctas": [1],
+      "explicacion": "Lambda ejecuta funciones en respuesta a eventos y se cobra por número de solicitudes y duración. No hay servidores que aprovisionar, parchear ni escalar: ese es el sentido de \"sin servidor\".",
+      "referencia": "AWS Lambda"
+    },
+    {
+      "id": "tec-05",
+      "dominio": "tecnologia",
+      "enunciado": "¿Qué servicio ofrece almacenamiento de objetos con durabilidad muy alta, ideal para imágenes, copias de seguridad y archivos estáticos?",
+      "opciones": [
+        "Amazon EBS",
+        "Amazon S3",
+        "Amazon EFS",
+        "Amazon RDS"
+      ],
+      "correctas": [1],
+      "explicacion": "S3 guarda objetos en buckets, sin límite práctico de tamaño total, y replica los datos dentro de la región. EBS y EFS son almacenamiento de archivos o de bloques pensados para conectarse a instancias.",
+      "referencia": "Amazon S3"
+    },
+    {
+      "id": "tec-06",
+      "dominio": "tecnologia",
+      "enunciado": "¿Qué servicio proporciona un volumen de almacenamiento en bloque que se conecta a una única instancia EC2, como si fuera un disco?",
+      "opciones": [
+        "Amazon S3",
+        "Amazon EBS",
+        "Amazon Glacier",
+        "AWS Storage Gateway"
+      ],
+      "correctas": [1],
+      "explicacion": "EBS ofrece volúmenes de bloque que se montan en una instancia dentro de la misma zona de disponibilidad y persisten aunque la instancia se detenga. Para compartir un sistema de archivos entre varias instancias se usa EFS.",
+      "referencia": "Amazon EBS"
+    },
+    {
+      "id": "tec-07",
+      "dominio": "tecnologia",
+      "enunciado": "Una aplicación necesita una base de datos NoSQL de clave-valor con latencia de milisegundos y escalado automático. ¿Cuál elegir?",
+      "opciones": [
+        "Amazon RDS",
+        "Amazon Redshift",
+        "Amazon DynamoDB",
+        "Amazon Aurora"
+      ],
+      "correctas": [2],
+      "explicacion": "DynamoDB es la base NoSQL gestionada de AWS, sin servidores que administrar. RDS y Aurora son relacionales; Redshift es un almacén de datos para analítica.",
+      "referencia": "Amazon DynamoDB"
+    },
+    {
+      "id": "tec-08",
+      "dominio": "tecnologia",
+      "enunciado": "El equipo de datos quiere ejecutar consultas analíticas sobre terabytes de información histórica de ventas. ¿Qué servicio está diseñado para eso?",
+      "opciones": [
+        "Amazon Redshift",
+        "Amazon DynamoDB",
+        "Amazon ElastiCache",
+        "Amazon Neptune"
+      ],
+      "correctas": [0],
+      "explicacion": "Redshift es el almacén de datos de AWS, optimizado para consultas analíticas sobre grandes volúmenes. Las bases transaccionales están pensadas para muchas operaciones pequeñas, no para agregaciones masivas.",
+      "referencia": "Amazon Redshift"
+    },
+    {
+      "id": "tec-09",
+      "dominio": "tecnologia",
+      "enunciado": "¿Qué servicio permite crear una red aislada lógicamente dentro de AWS, con subredes y control de tráfico?",
+      "opciones": [
+        "Amazon Route 53",
+        "Amazon VPC",
+        "AWS Direct Connect",
+        "Elastic Load Balancing"
+      ],
+      "correctas": [1],
+      "explicacion": "VPC es tu red privada en AWS: defines el rango de direcciones, las subredes y las reglas de entrada y salida. Route 53 resuelve nombres de dominio y Direct Connect es una conexión dedicada desde tus instalaciones.",
+      "referencia": "Amazon VPC"
+    },
+    {
+      "id": "tec-10",
+      "dominio": "tecnologia",
+      "enunciado": "¿Qué servicio registra quién hizo cada llamada a la API de AWS, desde qué dirección IP y cuándo?",
+      "opciones": [
+        "Amazon CloudWatch",
+        "AWS CloudTrail",
+        "AWS Config",
+        "Amazon Inspector"
+      ],
+      "correctas": [1],
+      "explicacion": "CloudTrail es el registro de auditoría de acciones sobre la cuenta. CloudWatch, en cambio, recoge métricas y registros de rendimiento y dispara alarmas. Es una pareja que el examen confunde a propósito: CloudTrail responde quién hizo qué, CloudWatch responde cómo va.",
+      "referencia": "AWS CloudTrail"
+    },
+    {
+      "id": "tec-11",
+      "dominio": "tecnologia",
+      "enunciado": "Se quiere recibir una alerta cuando el uso de CPU de una instancia supere el 80 % durante cinco minutos. ¿Qué servicio se usa?",
+      "opciones": [
+        "Amazon CloudWatch",
+        "AWS CloudTrail",
+        "AWS Artifact",
+        "AWS Organizations"
+      ],
+      "correctas": [0],
+      "explicacion": "CloudWatch recoge métricas y permite crear alarmas que notifican o disparan una acción cuando se cruza un umbral, por ejemplo escalar el grupo de Auto Scaling.",
+      "referencia": "Amazon CloudWatch"
+    },
+    {
+      "id": "tec-12",
+      "dominio": "tecnologia",
+      "enunciado": "¿De qué formas se puede interactuar con los servicios de AWS? Selecciona dos.",
+      "opciones": [
+        "Consola de administración en el navegador",
+        "Interfaz de línea de comandos (AWS CLI)",
+        "Conectándose por escritorio remoto al hipervisor",
+        "Enviando una solicitud escrita al soporte de AWS"
+      ],
+      "correctas": [0, 1],
+      "explicacion": "Las tres vías oficiales son la consola, la CLI y los SDK para lenguajes de programación. Al hipervisor no accede ningún cliente: es infraestructura de AWS.",
+      "referencia": "Formas de acceso a AWS"
+    },
+    {
+      "id": "tec-13",
+      "dominio": "tecnologia",
+      "enunciado": "El tráfico de un sitio web sube y baja mucho durante el día. ¿Qué combinación mantiene el rendimiento y evita pagar capacidad ociosa?",
+      "opciones": [
+        "Una sola instancia EC2 del tipo más grande disponible",
+        "Amazon EC2 Auto Scaling junto con Elastic Load Balancing",
+        "Amazon S3 con alojamiento de sitio estático únicamente",
+        "AWS Direct Connect hacia el centro de datos propio"
+      ],
+      "correctas": [1],
+      "explicacion": "Auto Scaling ajusta el número de instancias según la demanda y el balanceador reparte las solicitudes entre las que estén sanas. Una sola instancia grande no escala y además es un punto único de fallo.",
+      "referencia": "EC2 Auto Scaling y ELB"
+    },
+    {
+      "id": "tec-14",
+      "dominio": "tecnologia",
+      "enunciado": "Una aplicación envía tareas a otro componente que las procesa a su propio ritmo, sin perder mensajes si el consumidor se cae. ¿Qué servicio corresponde?",
+      "opciones": [
+        "Amazon SQS",
+        "Amazon SNS",
+        "Amazon EventBridge",
+        "AWS Step Functions"
+      ],
+      "correctas": [0],
+      "explicacion": "SQS es una cola: los mensajes esperan hasta que alguien los procesa y confirma. SNS, en cambio, publica notificaciones a varios suscriptores a la vez y no las retiene esperando.",
+      "referencia": "Amazon SQS"
+    },
+
+    {
+      "id": "fac-01",
+      "dominio": "facturacion",
+      "enunciado": "Una empresa con varias cuentas AWS quiere una sola factura y aprovechar los descuentos por volumen del uso combinado. ¿Qué le permite hacerlo?",
+      "imagen": "organizations-facturacion.svg",
+      "opciones": [
+        "La facturación consolidada de AWS Organizations",
+        "AWS Cost Explorer",
+        "El nivel gratuito de AWS",
+        "AWS Trusted Advisor"
+      ],
+      "correctas": [0],
+      "explicacion": "Organizations agrupa las cuentas bajo una cuenta de administración que recibe una factura única. Como el consumo se suma, es más fácil alcanzar los tramos de precio por volumen que si cada cuenta pagara aparte.",
+      "referencia": "AWS Organizations · Facturación consolidada"
+    },
+    {
+      "id": "fac-02",
+      "dominio": "facturacion",
+      "enunciado": "Una empresa necesita respuesta en menos de 15 minutos para incidentes críticos y un administrador técnico de cuentas asignado. ¿Qué plan de soporte necesita?",
+      "opciones": [
+        "Básico",
+        "Developer",
+        "Business",
+        "Enterprise"
+      ],
+      "correctas": [3],
+      "explicacion": "El administrador técnico de cuentas y la respuesta de 15 minutos para cargas críticas caídas son propios del plan Enterprise. Business ofrece atención 24/7 por teléfono y chat, pero con tiempos de respuesta mayores.",
+      "referencia": "Planes de soporte de AWS"
+    },
+    {
+      "id": "fac-03",
+      "dominio": "facturacion",
+      "enunciado": "El equipo quiere recibir un aviso cuando el gasto del mes se acerque a un límite definido. ¿Qué herramienta usa?",
+      "opciones": [
+        "AWS Budgets",
+        "AWS Cost Explorer",
+        "AWS Pricing Calculator",
+        "AWS Artifact"
+      ],
+      "correctas": [0],
+      "explicacion": "Budgets fija umbrales de costo o de uso y envía alertas al acercarse o superarlos. Cost Explorer sirve para analizar el gasto ya ocurrido y ver tendencias, no para avisar.",
+      "referencia": "AWS Budgets"
+    },
+    {
+      "id": "fac-04",
+      "dominio": "facturacion",
+      "enunciado": "Antes de migrar, una empresa quiere estimar cuánto costaría su arquitectura en AWS. ¿Qué herramienta usa?",
+      "opciones": [
+        "AWS Pricing Calculator",
+        "AWS Cost Explorer",
+        "AWS Budgets",
+        "Informe de costos y uso"
+      ],
+      "correctas": [0],
+      "explicacion": "Pricing Calculator estima el costo de una arquitectura que todavía no existe. Las otras tres trabajan sobre consumo real ya facturado.",
+      "referencia": "AWS Pricing Calculator"
+    },
+    {
+      "id": "fac-05",
+      "dominio": "facturacion",
+      "enunciado": "¿Qué ofrece AWS Trusted Advisor?",
+      "opciones": [
+        "Informes de auditoría y certificaciones de cumplimiento",
+        "Recomendaciones sobre costos, rendimiento, seguridad, tolerancia a fallos y límites de servicio",
+        "Un canal de chat con ingenieros de soporte las 24 horas",
+        "Estimaciones de precio de arquitecturas nuevas"
+      ],
+      "correctas": [1],
+      "explicacion": "Trusted Advisor revisa la cuenta y sugiere mejoras en cinco categorías. Todas las cuentas ven un conjunto básico de comprobaciones; el catálogo completo llega con los planes Business y superiores.",
+      "referencia": "AWS Trusted Advisor"
+    }
+  ]
+}

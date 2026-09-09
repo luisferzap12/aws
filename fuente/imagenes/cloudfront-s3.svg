@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+  <rect width="720" height="400" fill="#ffffff"/>
+
+  <!-- Usuarios -->
+  <text x="92" y="40" font-size="16" font-weight="600" fill="#17222B">Usuarios</text>
+  <rect x="34" y="60" width="116" height="46" rx="6" fill="#ffffff" stroke="#5B7C99" stroke-width="2"/>
+  <text x="92" y="89" font-size="14" text-anchor="middle" fill="#17222B">São Paulo</text>
+  <rect x="34" y="176" width="116" height="46" rx="6" fill="#ffffff" stroke="#5B7C99" stroke-width="2"/>
+  <text x="92" y="205" font-size="14" text-anchor="middle" fill="#17222B">Madrid</text>
+  <rect x="34" y="292" width="116" height="46" rx="6" fill="#ffffff" stroke="#5B7C99" stroke-width="2"/>
+  <text x="92" y="321" font-size="14" text-anchor="middle" fill="#17222B">Singapur</text>
+
+  <!-- Ubicaciones de borde -->
+  <rect x="212" y="46" width="196" height="306" rx="8" fill="#F7F9FB" stroke="#7B4FA8" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="310" y="72" font-size="15" font-weight="600" text-anchor="middle" fill="#4A2E66">Ubicaciones de borde</text>
+
+  <rect x="238" y="92" width="144" height="52" rx="6" fill="#EDE3F5" stroke="#7B4FA8" stroke-width="2"/>
+  <text x="310" y="116" font-size="14" text-anchor="middle" fill="#4A2E66">Caché de borde</text>
+  <text x="310" y="134" font-size="13" text-anchor="middle" fill="#5B7C99">TTL configurable</text>
+
+  <rect x="238" y="176" width="144" height="52" rx="6" fill="#EDE3F5" stroke="#7B4FA8" stroke-width="2"/>
+  <text x="310" y="200" font-size="14" text-anchor="middle" fill="#4A2E66">Caché de borde</text>
+  <text x="310" y="218" font-size="13" text-anchor="middle" fill="#5B7C99">TTL configurable</text>
+
+  <rect x="238" y="260" width="144" height="52" rx="6" fill="#EDE3F5" stroke="#7B4FA8" stroke-width="2"/>
+  <text x="310" y="284" font-size="14" text-anchor="middle" fill="#4A2E66">Caché de borde</text>
+  <text x="310" y="302" font-size="13" text-anchor="middle" fill="#5B7C99">TTL configurable</text>
+
+  <!-- Origen -->
+  <rect x="472" y="120" width="216" height="160" rx="8" fill="#F7F9FB" stroke="#3F6EA6" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="580" y="146" font-size="15" font-weight="600" text-anchor="middle" fill="#3F6EA6">Región us-east-1</text>
+
+  <rect x="500" y="166" width="160" height="84" rx="6" fill="#EAF3EA" stroke="#2E7D5B" stroke-width="2"/>
+  <text x="580" y="196" font-size="15" text-anchor="middle" fill="#1F5B41">Bucket S3</text>
+  <text x="580" y="218" font-size="13" text-anchor="middle" fill="#5B7C99">objetos estáticos</text>
+  <text x="580" y="238" font-size="13" text-anchor="middle" fill="#5B7C99">acceso público bloqueado</text>
+
+  <defs>
+    <marker id="h" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto">
+      <path d="M0,0 L7,3.2 L0,6.4 z" fill="#5B7C99"/>
+    </marker>
+  </defs>
+  <line x1="150" y1="83" x2="234" y2="112" stroke="#5B7C99" stroke-width="2" marker-end="url(#h)"/>
+  <line x1="150" y1="199" x2="234" y2="199" stroke="#5B7C99" stroke-width="2" marker-end="url(#h)"/>
+  <line x1="150" y1="315" x2="234" y2="288" stroke="#5B7C99" stroke-width="2" marker-end="url(#h)"/>
+
+  <line x1="382" y1="118" x2="496" y2="176" stroke="#5B7C99" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#h)"/>
+  <line x1="382" y1="202" x2="496" y2="202" stroke="#5B7C99" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#h)"/>
+  <line x1="382" y1="286" x2="496" y2="244" stroke="#5B7C99" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#h)"/>
+  <text x="438" y="330" font-size="13" text-anchor="middle" fill="#5B7C99">solo si falla la caché</text>
+</svg>

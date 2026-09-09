@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 460" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+  <rect width="720" height="460" fill="#ffffff"/>
+
+  <rect x="16" y="16" width="688" height="428" rx="10" fill="#F7F9FB" stroke="#3F6EA6" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="34" y="42" font-size="17" font-weight="600" fill="#3F6EA6">Región AWS</text>
+
+  <!-- ALB -->
+  <rect x="256" y="62" width="208" height="46" rx="6" fill="#EDE3F5" stroke="#7B4FA8" stroke-width="2"/>
+  <text x="360" y="91" font-size="16" text-anchor="middle" fill="#4A2E66">Application Load Balancer</text>
+
+  <!-- AZ A -->
+  <rect x="46" y="140" width="300" height="270" rx="8" fill="#ffffff" stroke="#5B7C99" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="64" y="166" font-size="15" font-weight="600" fill="#17222B">Zona de disponibilidad A</text>
+
+  <rect x="76" y="188" width="240" height="92" rx="6" fill="#FDF1E7" stroke="#E8873A" stroke-width="2"/>
+  <text x="196" y="212" font-size="14" text-anchor="middle" fill="#96541B">Auto Scaling group</text>
+  <rect x="98" y="224" width="88" height="42" rx="5" fill="#ffffff" stroke="#E8873A" stroke-width="1.5"/>
+  <text x="142" y="250" font-size="14" text-anchor="middle" fill="#17222B">EC2</text>
+  <rect x="206" y="224" width="88" height="42" rx="5" fill="#ffffff" stroke="#E8873A" stroke-width="1.5"/>
+  <text x="250" y="250" font-size="14" text-anchor="middle" fill="#17222B">EC2</text>
+
+  <rect x="76" y="308" width="240" height="72" rx="6" fill="#E9EFF7" stroke="#3F6EA6" stroke-width="2"/>
+  <text x="196" y="336" font-size="15" text-anchor="middle" fill="#17222B">RDS primaria</text>
+  <text x="196" y="358" font-size="13" text-anchor="middle" fill="#5B7C99">lecturas y escrituras</text>
+
+  <!-- AZ B -->
+  <rect x="374" y="140" width="300" height="270" rx="8" fill="#ffffff" stroke="#5B7C99" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="392" y="166" font-size="15" font-weight="600" fill="#17222B">Zona de disponibilidad B</text>
+
+  <rect x="404" y="188" width="240" height="92" rx="6" fill="#FDF1E7" stroke="#E8873A" stroke-width="2"/>
+  <text x="524" y="212" font-size="14" text-anchor="middle" fill="#96541B">Auto Scaling group</text>
+  <rect x="426" y="224" width="88" height="42" rx="5" fill="#ffffff" stroke="#E8873A" stroke-width="1.5"/>
+  <text x="470" y="250" font-size="14" text-anchor="middle" fill="#17222B">EC2</text>
+  <rect x="534" y="224" width="88" height="42" rx="5" fill="#ffffff" stroke="#E8873A" stroke-width="1.5"/>
+  <text x="578" y="250" font-size="14" text-anchor="middle" fill="#17222B">EC2</text>
+
+  <rect x="404" y="308" width="240" height="72" rx="6" fill="#F2F4F6" stroke="#8C96A0" stroke-width="2" stroke-dasharray="5 4"/>
+  <text x="524" y="336" font-size="15" text-anchor="middle" fill="#17222B">RDS en espera</text>
+  <text x="524" y="358" font-size="13" text-anchor="middle" fill="#5B7C99">réplica síncrona</text>
+
+  <defs>
+    <marker id="g" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto">
+      <path d="M0,0 L7,3.2 L0,6.4 z" fill="#5B7C99"/>
+    </marker>
+  </defs>
+  <line x1="300" y1="108" x2="196" y2="184" stroke="#5B7C99" stroke-width="2" marker-end="url(#g)"/>
+  <line x1="420" y1="108" x2="524" y2="184" stroke="#5B7C99" stroke-width="2" marker-end="url(#g)"/>
+  <line x1="316" y1="344" x2="400" y2="344" stroke="#5B7C99" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#g)"/>
+</svg>

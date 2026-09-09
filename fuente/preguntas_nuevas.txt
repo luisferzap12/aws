@@ -1,0 +1,31 @@
+D: seguridad
+P: ¿Qué servicio almacena credenciales de bases de datos y las rota automáticamente?
+- AWS Systems Manager Parameter Store
+* AWS Secrets Manager
+- AWS Key Management Service
+- AWS Artifact
+E: Secrets Manager guarda secretos cifrados y puede rotarlos sin que nadie toque la
+   aplicación. Parameter Store guarda parámetros de configuración y no rota por sí solo.
+R: AWS Secrets Manager
+
+D: tecnologia
+P: Una empresa necesita mover 80 TB a AWS y su conexión a internet tardaría meses.
+   ¿Qué servicio usa?
+- AWS Direct Connect
+* AWS Snowball
+- Amazon S3 Transfer Acceleration
+- AWS DataSync
+E: Snowball es un dispositivo físico que AWS envía, se copian los datos y se devuelve.
+   Para volúmenes grandes con poco ancho de banda sale más rápido que cualquier
+   transferencia por red.
+R: AWS Snow Family
+
+D: facturacion
+P: ¿Qué categorías incluye el nivel gratuito de AWS? Selecciona dos.
+* Servicios siempre gratuitos hasta cierto límite mensual
+* Servicios gratuitos durante los primeros 12 meses
+- Descuento del 50 % en instancias reservadas
+- Soporte Enterprise sin costo el primer año
+E: El nivel gratuito tiene tres categorías: siempre gratis, gratis 12 meses y pruebas
+   de corta duración. No incluye descuentos en reservas ni soporte de pago.
+R: Nivel gratuito de AWS
