@@ -323,7 +323,7 @@ const $ = (id) => document.getElementById(id);
 const LETRAS = ["A", "B", "C", "D", "E", "F"];
 const CLAVE = "repaso-aws:" + (BANCO.certificacion || "generico");
 const UMBRAL = Number(BANCO.umbral) || 70;
-const VERSION = "202609090406";
+const VERSION = "202609091651";
 
 function barajar(lista) {
   const copia = lista.slice();
@@ -747,5 +747,10 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   });
 }
 </script>
+<!-- Analítica de visitas — GoatCounter (sin cookies, sin banner de consentimiento).
+     Panel: https://luisferzap12.goatcounter.com
+     Se inserta al final del <body> al compilar con --analitica analitica.html -->
+<script data-goatcounter="https://luisferzap12.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
