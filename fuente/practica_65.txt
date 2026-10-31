@@ -1,0 +1,758 @@
+D: tecnologia
+P: ¿Qué servicios de AWS se pueden utilizar para proporcionar conectividad de red entre una red en las instalaciones y una VPC? Selecciona dos.
+* AWS Direct Connect
+* AWS VPN
+- Amazon Route 53
+- AWS Data Exchange
+- Amazon Connect
+E: Direct Connect es una conexión física dedicada entre tu centro de datos y AWS: no pasa por
+   internet, así que ofrece ancho de banda constante y latencia predecible, pero tarda semanas en
+   aprovisionarse. AWS VPN crea un túnel cifrado sobre internet público: se monta en minutos y
+   cuesta menos, a cambio de depender del rendimiento de internet. Route 53 es DNS, Data Exchange
+   es un catálogo de datos de terceros y Amazon Connect es un centro de contacto: ninguno conecta
+   redes.
+R: Conectividad híbrida
+
+D: facturacion
+P: ¿Qué puede hacer una empresa para aislar los costos de las cargas de trabajo en producción y las que aún no están en producción en AWS?
+I: organizations-facturacion.svg
+* Utilizar cuentas diferentes para producción y para lo que no está en producción
+- Crear roles de IAM distintos para cada tipo de carga de trabajo
+- Utilizar Amazon CloudWatch para monitorear el uso de los servicios
+- Usar Amazon EC2 para desarrollo y otros servicios para producción
+E: La cuenta de AWS es la unidad natural de aislamiento, tanto de costos como de permisos. Con
+   AWS Organizations agrupas varias cuentas bajo una factura consolidada, pero cada una mantiene
+   su gasto identificado por separado. Los roles de IAM controlan permisos, no costos, y
+   CloudWatch mide rendimiento, no facturación.
+R: AWS Organizations · Aislamiento de costos
+
+D: seguridad
+P: ¿Qué controles son controles compartidos según el modelo de responsabilidad compartida de AWS? Selecciona dos.
+I: responsabilidad-compartida.svg
+* Administración de parches
+* Administración de la configuración
+- Seguridad de la zona
+- Controles de entorno
+- Controles de seguridad física
+E: Un control compartido es aquel donde ambas partes tienen una tarea en capas distintas. En
+   parches, AWS actualiza la infraestructura y el hipervisor, y tú el sistema operativo invitado
+   y tus aplicaciones. En configuración, AWS configura sus dispositivos y tú los tuyos. La
+   seguridad de la zona, los controles de entorno y la seguridad física son exclusivos de AWS: ni
+   siquiera tienes acceso a ellos.
+R: Modelo de responsabilidad compartida · Controles compartidos
+
+D: seguridad
+P: Una aplicación en una instancia de Amazon EC2 necesita escribir datos de forma segura en un bucket de Amazon S3 sin usar credenciales a largo plazo. ¿Qué cumple con este requisito?
+* Un rol de IAM asignado a la instancia
+- Una clave de acceso de usuario de IAM guardada en la instancia
+- AWS Shield
+- Amazon Cognito
+E: Un rol de IAM es una identidad con permisos que se puede asumir temporalmente. Al asignarlo a
+   la instancia, AWS entrega credenciales que caducan y se renuevan solas, así que no hay claves
+   escritas en disco que alguien pueda robar. Las claves de acceso de un usuario son credenciales
+   de larga duración y son justo lo que el enunciado prohíbe. Cognito autentica a los usuarios
+   finales de una aplicación, no a los servicios entre sí.
+R: IAM · Roles para EC2
+
+D: tecnologia
+P: ¿Qué servicio de AWS reduce la latencia de los sitios web estáticos que se ejecutan en AWS?
+I: cloudfront-s3.svg
+* Amazon CloudFront
+- Amazon S3 Transfer Acceleration
+- AWS Data Exchange
+- AWS Lambda
+E: CloudFront es la red de entrega de contenido de AWS: guarda copias en caché del contenido en
+   las ubicaciones de borde, que son muchas más que las regiones, y sirve a cada usuario desde la
+   más cercana. Transfer Acceleration también usa la red de borde, pero acelera las cargas y
+   descargas hacia un bucket, no la entrega repetida a muchos visitantes.
+R: Amazon CloudFront
+
+D: tecnologia
+P: Una empresa necesita establecer un túnel de AWS Site-to-Site VPN. ¿Qué tipo de puerta de enlace debe utilizar?
+I: vpc-subredes.svg
+* Puerta de enlace privada virtual (virtual private gateway)
+- Puerta de enlace de NAT
+- Puerta de enlace de Internet
+- Puerta de enlace de AWS Direct Connect
+E: La puerta de enlace privada virtual es el extremo de la conexión VPN del lado de AWS; en el
+   lado del cliente va un customer gateway, y entre ambos se levanta el túnel cifrado. La puerta
+   de enlace de internet da salida pública a una subred, el NAT Gateway permite salida sin
+   entrada desde subredes privadas, y la de Direct Connect es para conexiones dedicadas, no VPN.
+R: VPC · Virtual private gateway
+
+D: facturacion
+P: ¿Qué recomendaciones se incluyen en las verificaciones de AWS Trusted Advisor? Selecciona dos.
+* Permisos de bucket de Amazon S3
+* Uso de la autenticación multifactor en el usuario raíz de la cuenta
+- Parches de software disponibles para instancias de Amazon EC2
+- Interrupciones del servicio de AWS
+- Cantidad de usuarios en la cuenta
+E: Trusted Advisor inspecciona tu cuenta y recomienda mejoras en cinco categorías: costos,
+   rendimiento, seguridad, tolerancia a fallos y límites de servicio. Los buckets abiertos al
+   público y la falta de MFA en el usuario raíz son dos de sus comprobaciones clásicas. Los
+   parches del sistema operativo los revisa Amazon Inspector, y el estado de los servicios se
+   consulta en el AWS Health Dashboard.
+R: AWS Trusted Advisor
+
+D: seguridad
+P: ¿Qué servicio de AWS ayuda a proteger las aplicaciones que se ejecutan en AWS de los ataques de denegación de servicio distribuido?
+* AWS Shield
+- Amazon Inspector
+- Amazon GuardDuty
+- AWS Auto Scaling
+E: Shield es el servicio de protección contra denegación de servicio distribuido. Shield Standard
+   se aplica sin costo a todos los clientes; Shield Advanced es de pago y agrega protección ante
+   ataques mayores, acceso al equipo de respuesta de AWS y cobertura del sobrecosto que genera el
+   ataque. Inspector busca vulnerabilidades de software y GuardDuty detecta actividad sospechosa:
+   ninguno de los dos frena el tráfico de un ataque.
+R: AWS Shield
+
+D: conceptos
+P: Una empresa quiere aumentar su capacidad de recuperar la infraestructura ante un desastre natural. ¿Qué pilar del marco Well-Architected representa esa capacidad?
+* Fiabilidad
+- Eficiencia del rendimiento
+- Optimización de costos
+- Seguridad
+E: El pilar de fiabilidad cubre la capacidad de una carga de trabajo para recuperarse de las
+   interrupciones, adquirir recursos de forma dinámica y mitigar fallos. La recuperación ante
+   desastres cae de lleno ahí. Los seis pilares son excelencia operativa, seguridad, fiabilidad,
+   eficiencia del rendimiento, optimización de costos y sostenibilidad.
+R: Well-Architected · Fiabilidad
+
+D: tecnologia
+P: Una empresa necesita una base de datos relacional en AWS que registre los pedidos de clientes nuevos desde un sitio web. ¿Qué servicio cumple con el requisito?
+* Amazon Aurora
+- Amazon Neptune
+- Amazon Redshift
+- Amazon DynamoDB
+E: Aurora es la base de datos relacional de AWS, compatible con MySQL y PostgreSQL, diseñada para
+   la nube y gestionada desde RDS. Registrar pedidos es carga transaccional, que es justo su
+   terreno. Neptune es de grafos, DynamoDB es NoSQL de clave-valor y Redshift es un almacén de
+   datos pensado para consultas analíticas, no para escrituras constantes.
+R: Amazon Aurora
+
+D: facturacion
+P: La dirección de una empresa quiere evitar los contratos a largo plazo y le interesa AWS para pasar de costos fijos a costos variables. ¿Cuál es la propuesta de valor de AWS para esta empresa?
+* Precios de pago por uso
+- Descuentos por volumen
+- Optimización de costos
+- Economía de escala
+E: El pago por uso es el modelo base de AWS: pagas por los recursos que consumes mientras los
+   consumes, sin compromiso mínimo. Eso convierte una inversión de capital en gasto operativo
+   variable. Las economías de escala explican por qué los precios son bajos, pero no son un
+   modelo de contratación, y los descuentos por volumen sí implican compromiso.
+R: Conceptos · Pago por uso
+
+D: tecnologia
+P: Una empresa no tiene centro de datos físico, pero necesita conectar los portátiles de sus empleados directamente con la nube de AWS. ¿Qué servicio cumple el requisito?
+* AWS Client VPN
+- AWS Site-to-Site VPN
+- AWS Direct Connect
+- Amazon Connect
+E: Client VPN conecta dispositivos individuales, como el portátil de cada empleado, a los recursos
+   de AWS mediante un cliente de software. Site-to-Site VPN conecta redes completas, lo que aquí
+   no aplica porque no hay centro de datos. Direct Connect es un enlace físico dedicado entre
+   instalaciones y AWS.
+R: AWS Client VPN
+
+D: seguridad
+P: Un usuario debe cifrar los datos que AWS CloudTrail recibe, almacena y administra. ¿Qué servicio ofrece esa opción?
+* AWS Key Management Service (AWS KMS)
+- AWS Certificate Manager
+- AWS Systems Manager
+- AWS Secrets Manager
+E: KMS crea y controla las claves de cifrado que usan la mayoría de servicios de AWS, incluidos
+   los registros de CloudTrail en S3. Cada uso de la clave queda a su vez registrado, lo que sirve
+   para auditoría. Certificate Manager emite certificados TLS para proteger datos en tránsito y
+   Secrets Manager guarda y rota credenciales, no cifra registros de auditoría.
+R: AWS KMS
+
+D: seguridad
+P: Dentro del modelo de responsabilidad compartida, ¿qué actividades son responsabilidad del cliente? Selecciona dos.
+I: responsabilidad-compartida.svg
+* Cifrar los datos en el lado del cliente
+* Configurar las listas de control de acceso de red
+- Capacitar al personal del centro de datos
+- Aplicar parches al sistema operativo subyacente de Amazon RDS
+- Mantener los controles del entorno dentro de un centro de datos
+E: La regla práctica: si la tarea se hace desde la consola o la API, es del cliente; si implica
+   tocar hardware o instalaciones, es de AWS. El cifrado y las ACL de red se configuran, así que
+   son tuyas. RDS es un servicio gestionado, de modo que el parcheo del sistema operativo pasa a
+   AWS, y la capacitación del personal del centro de datos nunca fue tuya.
+R: Modelo de responsabilidad compartida
+
+D: tecnologia
+P: ¿Qué servicio de AWS se debe usar para ejecutar una base de datos relacional autogestionada?
+* Amazon EC2
+- Amazon ElastiCache
+- Amazon Route 53
+- Amazon DynamoDB
+E: La palabra clave es autogestionada: instalas tú el motor y te encargas del sistema operativo,
+   los parches y las copias de seguridad, lo que exige un servidor virtual, es decir EC2. Si
+   quisieras que AWS gestionara todo eso, la respuesta sería RDS. ElastiCache es una caché en
+   memoria y DynamoDB es NoSQL, no relacional.
+R: Amazon EC2
+
+D: conceptos
+P: Tras una fusión, una empresa hereda una cuenta de AWS con infraestructura existente y debe comprobar que sigue las prácticas recomendadas de costos, seguridad y rendimiento. ¿Qué herramienta debe usar?
+* La herramienta de AWS Well-Architected
+- AWS Compute Optimizer
+- AWS Config
+- AWS Cost Explorer
+E: La herramienta de Well-Architected guía una revisión por los seis pilares del marco mediante un
+   cuestionario y entrega un informe con los riesgos detectados y un plan de mejora. Es la única
+   opción que abarca costos, seguridad y rendimiento a la vez. Compute Optimizer solo recomienda
+   tipos de instancia, Config vigila cambios de configuración y Cost Explorer analiza gasto.
+R: AWS Well-Architected Tool
+
+D: seguridad
+P: ¿Qué servicio ayuda a cumplir requisitos contractuales y normativos de seguridad de datos mediante dispositivos de hardware dedicados dentro de la nube de AWS?
+* AWS CloudHSM
+- AWS Key Management Service (AWS KMS)
+- AWS Secrets Manager
+- AWS Directory Service
+E: CloudHSM entrega módulos de seguridad de hardware de un solo inquilino que solo tú controlas:
+   ni AWS tiene acceso a las claves. Es la respuesta cuando el enunciado menciona hardware
+   dedicado o certificación FIPS 140-2 nivel 3. KMS cubre la mayoría de casos, pero es
+   multiinquilino y AWS administra el hardware.
+R: AWS CloudHSM
+
+D: tecnologia
+P: ¿Qué servicio ayuda a recopilar, procesar y analizar datos de streaming en tiempo real, como registros operativos, transacciones financieras o canales de redes sociales?
+* Amazon Kinesis
+- Amazon Redshift
+- Amazon Athena
+- AWS Direct Connect
+E: Kinesis está diseñado para datos que llegan de forma continua y hay que procesar en el momento;
+   admite varios consumidores leyendo el mismo flujo y retiene los datos un periodo configurable.
+   Redshift y Athena analizan datos que ya están almacenados, así que trabajan sobre el pasado, no
+   sobre el flujo en vivo.
+R: Amazon Kinesis
+
+D: tecnologia
+P: Un profesional de la nube debe recomendar una herramienta de visualización de datos para que los analistas creen información de inteligencia empresarial. ¿Qué servicio recomienda?
+* Amazon QuickSight
+- Amazon Comprehend
+- AWS X-Ray
+- Amazon Rekognition
+E: QuickSight es el servicio de inteligencia empresarial de AWS: crea paneles e informes
+   interactivos a partir de distintas fuentes de datos, equivalente a herramientas como Power BI.
+   Comprehend analiza texto, Rekognition analiza imágenes y video, y X-Ray traza solicitudes entre
+   microservicios para depurar.
+R: Amazon QuickSight
+
+D: conceptos
+P: Una empresa desarrolla una aplicación nueva en AWS y necesita poder cambiar la aplicación y los recursos que utiliza con rapidez. ¿Qué característica de la nube cumple ese requisito?
+* Agilidad
+- Rendimiento
+- Elasticidad
+- Fiabilidad
+E: La agilidad es la capacidad de pasar de la idea al recurso funcionando en minutos, y de
+   cambiarlo o descartarlo sin penalización. Permite experimentar barato. No confundirla con la
+   elasticidad, que es el ajuste automático de capacidad según la demanda, ni con la fiabilidad,
+   que es seguir funcionando pese a los fallos.
+R: Conceptos · Agilidad
+
+D: conceptos
+P: ¿Cuáles son beneficios de utilizar la nube de AWS? Selecciona dos.
+* Aumento de la velocidad y la agilidad
+* Capacidad de implementar de forma global en minutos
+- Todos los datos de los usuarios quedan respaldados a nivel mundial
+- Evitar por completo los riesgos de filtraciones de seguridad
+- Eliminar la necesidad de parchear el software del cliente
+E: AWS enumera seis ventajas: cambiar inversión de capital por gasto variable, aprovecharse de
+   economías de escala, dejar de adivinar la capacidad, aumentar velocidad y agilidad, dejar de
+   gastar en operar centros de datos y volverse global en minutos. Las otras tres opciones son
+   falsas: las copias de seguridad las configuras tú, la seguridad es compartida y el software que
+   instalas sigue siendo responsabilidad tuya.
+R: Conceptos · Beneficios de la nube
+
+D: facturacion
+P: ¿Qué servicio permite a una empresa analizar los costos y el uso de AWS a lo largo del tiempo?
+* AWS Cost Explorer
+- AWS Budgets
+- AWS Organizations
+- Facturación consolidada
+E: Cost Explorer muestra hasta doce meses de historial de gasto con gráficos, filtros por servicio,
+   cuenta o etiqueta, y proyecciones. Responde a la pregunta de en qué se fue el dinero. Budgets
+   hace lo contrario: fija un umbral y avisa al acercarte, pero no sirve para analizar tendencias.
+R: AWS Cost Explorer
+
+D: tecnologia
+P: Una empresa debe implementar una instancia de Amazon EC2 y adjuntarle un almacenamiento para los archivos de la aplicación y del sistema operativo. ¿Qué servicio cumple el requisito?
+* Amazon Elastic Block Store (Amazon EBS)
+- Amazon Elastic File System (Amazon EFS)
+- Amazon S3
+- AWS Backup
+E: EBS entrega volúmenes de almacenamiento en bloque que se conectan a una instancia como si
+   fueran un disco, y es lo que soporta el volumen raíz con el sistema operativo. Vive en una sola
+   zona de disponibilidad y persiste aunque la instancia se detenga. EFS es un sistema de archivos
+   compartido entre varias instancias y S3 es almacenamiento de objetos: ninguno sirve como disco
+   de arranque.
+R: Amazon EBS
+
+D: conceptos
+P: ¿Qué perspectiva del AWS Cloud Adoption Framework sirve de puente entre la tecnología y el negocio?
+* Personas
+- Gobernanza
+- Operaciones
+- Seguridad
+E: AWS define la perspectiva de personas como el puente entre la tecnología y el negocio: se ocupa
+   de la cultura, la estructura organizativa, el liderazgo y las competencias del equipo para que
+   la organización evolucione al ritmo de la nube. La de gobernanza orquesta las iniciativas y
+   gestiona los riesgos; la de negocio alinea las inversiones con los resultados esperados.
+R: AWS CAF · Perspectiva de personas
+
+D: facturacion
+P: Una empresa requiere que sus instancias de Amazon EC2 queden aisladas físicamente de las instancias de otros clientes. ¿Qué opción de compra cumple el requisito?
+* Hosts dedicados
+- Instancias reservadas
+- Instancias de spot
+- Instancias bajo demanda
+E: El host dedicado es un servidor físico completo reservado para tu uso exclusivo, sin otros
+   clientes en el mismo hardware. Se usa cuando lo exige una normativa o cuando una licencia de
+   software se cobra por servidor físico. Es la opción más cara y las demás solo cambian el modelo
+   de precio, no el aislamiento del hardware.
+R: EC2 · Hosts dedicados
+
+D: seguridad
+P: ¿Qué mecanismos de seguridad se pueden utilizar para restringir o permitir el acceso a los recursos de una VPC? Selecciona dos.
+I: vpc-subredes.svg
+* ACL de red
+* Grupo de seguridad
+- Interfaz de red elástica
+- Tabla de enrutamiento
+- Registros de flujo de VPC
+E: El grupo de seguridad es un firewall con estado que se asocia a interfaces de red y solo admite
+   reglas de permitir: si autorizas la entrada, la respuesta sale sola. La ACL de red es sin
+   estado, se asocia a la subred completa, admite permitir y denegar, y necesita reglas separadas
+   para ida y vuelta. La tabla de enrutamiento dirige el tráfico pero no lo filtra, y los registros
+   de flujo solo observan.
+R: VPC · Grupos de seguridad y ACL de red
+
+D: seguridad
+P: ¿Qué servicio permite auditar y monitorear los cambios en la configuración de los recursos de AWS?
+* AWS Config
+- Amazon GuardDuty
+- Amazon Inspector
+- AWS Trusted Advisor
+E: Config registra el historial de configuración de cada recurso a lo largo del tiempo y evalúa si
+   cumple reglas que tú defines, alertando cuando algo se desvía. Responde a cómo estaba
+   configurado esto la semana pasada. Si la pregunta fuera quién hizo el cambio, la respuesta
+   sería CloudTrail: Config guarda el estado, CloudTrail guarda la acción.
+R: AWS Config
+
+D: tecnologia
+P: ¿Qué servicio se puede utilizar para implementar aplicaciones en AWS sin configurar la infraestructura manualmente?
+* AWS Elastic Beanstalk
+- AWS Config
+- Amazon Kinesis Data Streams
+- AWS Control Tower
+E: Elastic Beanstalk recibe tu código y aprovisiona por ti las instancias, el balanceador, el
+   escalado automático y la supervisión. Sigues teniendo acceso a los recursos subyacentes si
+   necesitas ajustarlos. Control Tower prepara entornos de varias cuentas con buenas prácticas,
+   que es un problema distinto.
+R: AWS Elastic Beanstalk
+
+D: tecnologia
+P: ¿Qué servicio distribuye automáticamente el tráfico web entrante entre varios destinos y escala según la demanda?
+* Elastic Load Balancing
+- Amazon Elastic Block Store (Amazon EBS)
+- AWS Direct Connect
+- AWS CodePipeline
+E: El balanceador reparte las solicitudes entre los destinos que estén sanos y crece solo para
+   absorber el tráfico. Suele trabajar junto a EC2 Auto Scaling: el balanceador reparte y Auto
+   Scaling ajusta el número de instancias. CodePipeline orquesta despliegues y EBS es
+   almacenamiento.
+R: Elastic Load Balancing
+
+D: facturacion
+P: Una empresa quiere ejecutar una aplicación sin estado en la que una interrupción ocasional es aceptable. ¿Cuál es la opción de precios de EC2 más asequible?
+* Instancias de spot
+- Instancias bajo demanda
+- Instancias reservadas
+- Reservas de capacidad bajo demanda
+E: Spot usa capacidad sobrante de AWS con descuentos de hasta el 90 %, a cambio de que AWS pueda
+   reclamarla con dos minutos de aviso. Las dos señales que el examen usa para spot son
+   precisamente tolerar interrupciones y no tener una fecha límite rígida. Las reservas exigen un
+   compromiso de uno o tres años, que aquí nadie pidió.
+R: EC2 · Instancias de spot
+
+D: tecnologia
+P: ¿Qué servicio ejecuta contenedores sin tener que aprovisionar ni administrar instancias de Amazon EC2?
+* AWS Fargate
+- Amazon Lightsail
+- AWS Elastic Beanstalk
+- AWS Batch
+E: Fargate es el modo sin servidor para contenedores y funciona tanto con ECS como con EKS: tú
+   defines cuánta CPU y memoria necesita la tarea y no hay instancias que parchear ni dimensionar.
+   Con ECS o EKS sobre EC2, en cambio, las instancias que forman el clúster siguen siendo tuyas.
+R: AWS Fargate
+
+D: conceptos
+P: ¿Cuáles de las siguientes son pilares del marco de AWS Well-Architected? Selecciona dos.
+* Eficiencia del rendimiento
+* Sostenibilidad
+- Uso de cifrado
+- Varias zonas de disponibilidad
+- Alta disponibilidad
+E: Los seis pilares son excelencia operativa, seguridad, fiabilidad, eficiencia del rendimiento,
+   optimización de costos y sostenibilidad. El cifrado, las zonas de disponibilidad y la alta
+   disponibilidad son prácticas o mecanismos que aparecen dentro de esos pilares, no pilares en sí
+   mismos.
+R: Well-Architected · Los seis pilares
+
+D: seguridad
+P: ¿Qué se debe usar para limitar a determinados usuarios el acceso a un bucket de Amazon S3?
+* Políticas de IAM
+- ACL de red
+- Grupos de seguridad
+- AWS Key Management Service (AWS KMS)
+E: Una política de IAM es un documento JSON que declara qué acciones se permiten o deniegan sobre
+   qué recursos, y es el mecanismo con el que se aplica el mínimo privilegio. Los grupos de
+   seguridad y las ACL de red filtran tráfico por IP y puerto dentro de una VPC, pero S3 no vive
+   en tu VPC: su acceso se controla por identidad, no por red.
+R: IAM · Políticas
+
+D: seguridad
+P: Una empresa quiere mejorar la seguridad de los usuarios de IAM en su cuenta. ¿Qué métodos debe utilizar? Selecciona dos.
+* Exigir autenticación multifactor
+* Imponer una política de contraseñas con nivel de seguridad y vencimiento
+- Proteger los recursos con AWS Shield
+- Implementar Amazon Rekognition
+- Bloquear el acceso con grupos de seguridad
+E: La autenticación multifactor añade un segundo factor además de la contraseña, de modo que
+   robarla ya no basta para entrar. La política de contraseñas fija longitud, complejidad y
+   caducidad para toda la cuenta. Shield protege contra denegación de servicio y Rekognition
+   analiza imágenes: ninguno tiene que ver con identidades.
+R: IAM · Buenas prácticas
+
+D: tecnologia
+P: ¿Qué servicio de almacenamiento híbrido permite que las aplicaciones en las instalaciones usen el almacenamiento en la nube de AWS sin cambios?
+* AWS Storage Gateway
+- AWS Backup
+- AWS Direct Connect
+- Amazon Connect
+E: Storage Gateway presenta el almacenamiento de AWS a las aplicaciones locales con protocolos que
+   ya entienden, como NFS, SMB o iSCSI, y mantiene una caché local de lo que más se usa. La
+   aplicación cree que escribe en un disco local mientras los datos acaban en S3 o Glacier. AWS
+   Backup centraliza copias de seguridad, que es otra cosa.
+R: AWS Storage Gateway
+
+D: tecnologia
+P: Una empresa quiere mejorar la disponibilidad y el rendimiento general de sus aplicaciones alojadas en AWS para usuarios de todo el mundo. ¿Qué servicio debe utilizar?
+* AWS Global Accelerator
+- Amazon Lightsail
+- AWS Storage Gateway
+- Amazon Connect
+E: Global Accelerator entrega dos direcciones IP estáticas y lleva el tráfico a la red troncal de
+   AWS desde la ubicación de borde más cercana al usuario, lo que reduce la latencia incluso con
+   contenido que no se puede cachear. Además conmuta a otra región en segundos si falla la
+   primaria. CloudFront, que no está entre las opciones, sería la respuesta si el contenido fuera
+   cacheable.
+R: AWS Global Accelerator
+
+D: seguridad
+P: ¿Qué servicio ayuda a identificar al usuario que eliminó una instancia de Amazon EC2 ayer?
+* AWS CloudTrail
+- Amazon CloudWatch
+- Amazon Inspector
+- AWS Trusted Advisor
+E: CloudTrail registra cada llamada a la API de AWS con quién la hizo, desde qué dirección IP y
+   cuándo: es el registro de auditoría de la cuenta. CloudWatch recoge métricas y registros de
+   rendimiento y dispara alarmas. El examen los confunde a propósito: CloudTrail responde quién
+   hizo qué, CloudWatch responde cómo va.
+R: AWS CloudTrail
+
+D: tecnologia
+P: ¿Qué servicio permite aprovisionar la infraestructura como código y replicarla de forma repetible en otra región?
+* AWS CloudFormation
+- AWS Config
+- AWS Organizations
+- AWS CodeBuild
+E: CloudFormation toma una plantilla en YAML o JSON que describe los recursos y los crea como una
+   pila. Si algo falla revierte los cambios, y eliminar la pila elimina todo lo que creó. Al ser
+   una plantilla reutilizable, desplegar la misma arquitectura en otra región es cuestión de
+   ejecutarla allí. AWS Config, pese al nombre parecido, solo vigila configuraciones existentes.
+R: AWS CloudFormation
+
+D: tecnologia
+P: ¿Qué servicio permite desacoplar los componentes de una aplicación para que escalen de forma independiente?
+* Amazon Simple Queue Service (Amazon SQS)
+- Amazon Simple Email Service (Amazon SES)
+- Amazon S3
+- AWS Outposts
+E: SQS es una cola de mensajes: el productor deja el mensaje y el consumidor lo procesa a su propio
+   ritmo, de modo que ninguno depende de la disponibilidad del otro y los picos quedan
+   amortiguados. Ese desacoplamiento es un principio de diseño central en la nube. SNS, que no
+   está entre las opciones, reparte notificaciones a varios suscriptores pero no amortigua.
+R: Amazon SQS
+
+D: facturacion
+P: Un profesional de la nube necesita ejecutar una instancia de Amazon EC2 durante 7 horas sin interrupciones. ¿Cuál es la opción más rentable?
+* Instancia bajo demanda
+- Instancia de spot
+- Instancia reservada
+- Host dedicado
+E: Para un uso puntual de pocas horas, bajo demanda es lo correcto: se paga por segundo sin
+   compromiso y se apaga al terminar. Spot sería más barato pero el enunciado exige que no haya
+   interrupciones, y AWS puede reclamar esa capacidad. Una reserva obliga a comprometer uno o tres
+   años para una tarea de 7 horas.
+R: EC2 · Modelos de compra
+
+D: seguridad
+P: Una empresa ejecuta una carga de trabajo en AWS. ¿Cuáles son responsabilidades del cliente? Selecciona dos.
+I: responsabilidad-compartida.svg
+* Configurar los permisos de los usuarios de IAM con mínimo privilegio
+* Restringir un bucket de Amazon S3 a determinados usuarios de IAM
+- Aplicar parches al sistema operativo que utilizan las funciones de AWS Lambda
+- Controlar el acceso físico a los recursos de AWS
+- Aplicar parches a los dispositivos de red de la VPC
+E: Todo lo que se configura desde la consola o la API es del cliente: identidades, permisos y
+   acceso a los datos. En Lambda el cliente solo responde por su código y sus permisos, porque el
+   sistema operativo y el tiempo de ejecución los mantiene AWS. El acceso físico y los dispositivos
+   de red de la infraestructura nunca son del cliente.
+R: Modelo de responsabilidad compartida
+
+D: seguridad
+P: ¿Qué servicio ofrece descargas bajo demanda de los informes de seguridad y cumplimiento de AWS, como SOC 2 e ISO 27001?
+* AWS Artifact
+- AWS Directory Service
+- AWS Trusted Advisor
+- Amazon Inspector
+E: Artifact es el repositorio donde AWS pone a disposición sus informes de auditoría y los acuerdos
+   que el cliente puede necesitar, descargables desde la consola. Es lo que entregas a un auditor
+   que pregunta si AWS cumple una norma. No confundir con AWS Audit Manager, que recopila
+   evidencias de tu propia carga de trabajo.
+R: AWS Artifact
+
+D: conceptos
+P: ¿Qué beneficio de la nube permite aprovisionar solo los recursos necesarios y ajustarlos al instante a medida que cambia la demanda?
+* Elasticidad
+- Alta disponibilidad
+- Ahorro de costos
+- Seguridad
+E: La elasticidad es el ajuste automático de capacidad en ambas direcciones: crece en el pico y se
+   reduce cuando la demanda baja, para que dejes de pagar capacidad ociosa. No es lo mismo que la
+   alta disponibilidad, que consiste en seguir funcionando ante un fallo, ni que la escalabilidad,
+   que es la capacidad de crecer sin que el sistema se degrade.
+R: Conceptos · Elasticidad
+
+D: seguridad
+P: ¿Qué se puede utilizar para bloquear el tráfico hacia un puerto específico en una subred de la VPC?
+* ACL de red
+- Interconexiones de Amazon VPC
+- Amazon Route 53
+- AWS Direct Connect
+E: La ACL de red se asocia a la subred y, a diferencia del grupo de seguridad, admite reglas de
+   denegación explícita por protocolo y puerto, evaluadas en orden de número de regla. Por eso es
+   la herramienta cuando el enunciado habla de bloquear. El grupo de seguridad también filtra, pero
+   solo puede permitir, y actúa en la interfaz de red, no en la subred.
+R: VPC · ACL de red
+
+D: tecnologia
+P: ¿Qué servicio agrega capacidades de conversión de voz a texto a las aplicaciones?
+* Amazon Transcribe
+- Amazon Polly
+- Amazon Textract
+- Amazon Comprehend
+E: Transcribe convierte audio en texto, por ejemplo para subtitular o analizar llamadas. Polly hace
+   justo lo contrario, convierte texto en voz. Textract extrae texto y tablas de documentos
+   escaneados y Comprehend analiza texto ya existente para detectar sentimiento o entidades.
+R: Amazon Transcribe
+
+D: conceptos
+P: Una empresa planea migrar a la nube y necesita orientación y prácticas recomendadas para guiar a las partes interesadas en el proceso. ¿Qué marco cumple el requisito?
+* AWS Cloud Adoption Framework (AWS CAF)
+- Marco de AWS Well-Architected
+- AWS Support
+- Amazon Connect
+E: El CAF organiza la adopción de la nube en seis perspectivas (negocio, personas, gobernanza,
+   plataforma, seguridad y operaciones) y se enfoca en preparar a la organización y a sus
+   personas. El marco Well-Architected, en cambio, evalúa el diseño técnico de una carga de
+   trabajo concreta. El CAF es para la transformación; Well-Architected es para la arquitectura.
+R: AWS Cloud Adoption Framework
+
+D: tecnologia
+P: Una empresa ejecuta una aplicación web en instancias de Amazon EC2 y quiere que la capacidad de cómputo se ajuste automáticamente a la demanda de los clientes. ¿Qué debe utilizar?
+* Amazon EC2 Auto Scaling
+- Amazon Lightsail
+- Reservas de capacidad de Amazon EC2
+- AWS Compute Optimizer
+E: Auto Scaling agrega o retira instancias según políticas basadas en métricas, horarios o
+   previsiones, manteniendo el grupo dentro de un mínimo y un máximo. Las reservas de capacidad
+   aseguran que haya hardware disponible, pero no cambian el número de instancias en marcha.
+   Compute Optimizer solo recomienda el tipo adecuado.
+R: EC2 Auto Scaling
+
+D: facturacion
+P: Una empresa migra una aplicación con uso constante y predecible que debe estar disponible en todo momento. ¿Qué opción de compra de EC2 es la más rentable?
+* Savings Plans
+- Instancia bajo demanda
+- Instancia de spot
+- Instancia dedicada
+E: Un Savings Plan es un compromiso de gasto por hora durante uno o tres años a cambio de precios
+   reducidos, y es lo que corresponde cuando la carga es estable y permanente. El de cómputo cubre
+   además Lambda y Fargate. Spot queda descartado porque puede interrumpirse, y bajo demanda es el
+   precio más alto por hora.
+R: Savings Plans
+
+D: seguridad
+P: ¿Cuál de estas es una responsabilidad de AWS en el modelo de responsabilidad compartida?
+I: responsabilidad-compartida.svg
+* Actualizar el firmware de los servidores físicos que alojan las instancias de EC2
+- Aplicar parches al sistema operativo que se ejecuta en una instancia de EC2
+- Actualizar las reglas de los grupos de seguridad
+- Actualizar las ACL de red
+E: AWS responde por la seguridad de la nube: hardware, firmware, hipervisor, red física e
+   instalaciones. El cliente responde por la seguridad en la nube: sistema operativo invitado,
+   aplicaciones, datos, identidades y configuración de red. Todo lo que se toca desde la consola
+   cae del lado del cliente.
+R: Modelo de responsabilidad compartida
+
+D: seguridad
+P: ¿Cuál de estas describe una práctica recomendada de seguridad que se implementa con IAM?
+* Otorgar a cada usuario solo los permisos de la tarea específica que debe ejecutar
+- Desactivar el acceso a la consola para todos los usuarios
+- Almacenar las credenciales de AWS dentro de las instancias de EC2
+- Generar claves secretas para cada usuario de IAM
+E: Es el principio de mínimo privilegio: se empieza sin permisos y se agregan solo los
+   estrictamente necesarios, en lugar de dar acceso amplio y recortar después. Guardar credenciales
+   en una instancia es el antipatrón que resuelven los roles, y crear claves de acceso para todos
+   multiplica las credenciales de larga duración que hay que rotar.
+R: IAM · Mínimo privilegio
+
+D: facturacion
+P: Una empresa necesita asesoramiento externo para construir su entorno de nube. ¿Qué puede utilizar para encontrar un tercero que la acompañe en la implementación?
+* AWS Partner Network (APN)
+- AWS Support
+- AWS Trusted Advisor
+- AWS Cloud Development Kit (AWS CDK)
+E: La red de socios de AWS es el directorio de empresas certificadas que ofrecen servicios de
+   consultoría e implementación, además de proveedores de software. AWS Support es el soporte
+   técnico del propio AWS sobre sus servicios, no consultoría de proyecto, y el CDK es una
+   biblioteca para definir infraestructura como código.
+R: AWS Partner Network
+
+D: conceptos
+P: Una empresa que migra a la nube necesita orientación sobre la administración del riesgo operativo para reducir su perfil de riesgo general. ¿Qué perspectiva del AWS CAF la proporciona?
+* Perspectiva de gobernanza
+- Perspectiva de seguridad
+- Perspectiva de operaciones
+- Perspectiva de negocio
+E: La perspectiva de gobernanza orquesta las iniciativas de nube maximizando los beneficios
+   organizativos y minimizando los riesgos de la transformación; la gestión de riesgos es una de
+   sus capacidades explícitas, junto con la gestión financiera y la de programas. La de seguridad
+   se ocupa de la confidencialidad e integridad de los datos, no del riesgo del proyecto.
+R: AWS CAF · Perspectiva de gobernanza
+
+D: facturacion
+P: ¿Cuál es un beneficio del modelo de precios de pago por uso de AWS?
+* Reduce los costos fijos y los convierte en costos variables
+- Reduce los costos variables
+- Solo es relevante para Amazon EC2, Amazon S3 y Amazon RDS
+- Requiere pago por anticipado de los servicios
+E: En un centro de datos propio se compra hardware por adelantado, un gasto de capital que se paga
+   aunque los servidores estén ociosos. En la nube ese costo fijo desaparece y se transforma en un
+   gasto operativo que sube y baja con el consumo real. El pago por uso aplica a la gran mayoría de
+   servicios, no solo a tres.
+R: Conceptos · Pago por uso
+
+D: seguridad
+P: ¿Qué servicio se puede utilizar para evitar los ataques de inyección SQL contra una aplicación web?
+* AWS WAF
+- Políticas de IAM
+- Grupos de seguridad
+- ACL de red
+E: WAF es un firewall de aplicaciones web: inspecciona el contenido de las solicitudes HTTP y
+   bloquea las que coinciden con reglas, incluidas reglas gestionadas para inyección SQL y
+   secuencias de comandos entre sitios. Los grupos de seguridad y las ACL filtran por IP, puerto y
+   protocolo, así que no pueden leer la solicitud ni detectar el ataque.
+R: AWS WAF
+
+D: facturacion
+P: ¿De qué manera se pueden compartir los descuentos de las instancias reservadas entre varias cuentas de AWS?
+I: organizations-facturacion.svg
+* Con la facturación consolidada de AWS Organizations
+- Con AWS Cost Explorer activado en todas las cuentas
+- Con AWS Compute Optimizer activado en todas las cuentas
+- Con roles de IAM entre cuentas
+E: Bajo una organización, el uso de todas las cuentas se suma en una sola factura y el descuento de
+   una reserva sin usar se aplica a cualquier instancia equivalente de la organización. Eso también
+   facilita alcanzar los tramos de precio por volumen. Los roles entre cuentas delegan permisos, no
+   descuentos.
+R: AWS Organizations · Facturación consolidada
+
+D: seguridad
+P: Según el modelo de responsabilidad compartida, ¿qué tareas realiza AWS? Selecciona dos.
+* Controlar el acceso físico al centro de datos donde se aloja la VPC del cliente
+* Aplicar parches a los balanceadores de Elastic Load Balancing
+- Determinar qué servicios pueden acceder a una tabla de Amazon DynamoDB
+- Configurar un bucket de Amazon S3 para permitir el acceso público
+- Configurar los usuarios de IAM con mínimo privilegio
+E: AWS mantiene las instalaciones y el software de sus servicios gestionados, y el balanceador es
+   uno de ellos: tú defines sus reglas, pero el parcheo del servicio lo hace AWS. Las otras tres
+   son decisiones de configuración que solo el cliente puede tomar desde su cuenta.
+R: Modelo de responsabilidad compartida
+
+D: tecnologia
+P: Una empresa quiere implementar una aplicación comercial global en EC2 con la máxima redundancia y tolerancia a errores. ¿Cómo debe desplegar las instancias?
+I: regiones-az.svg
+* En varias zonas de disponibilidad de dos regiones de AWS
+- En varias zonas de disponibilidad de una sola región
+- En una sola zona de disponibilidad de una región
+- Con varias interfaces de red elástica en subredes distintas
+E: Repartir entre varias zonas protege de la caída de un centro de datos y es lo mínimo
+   recomendable. Añadir una segunda región protege además del fallo de una región completa y acerca
+   la aplicación a los usuarios. Cuando el enunciado pide la máxima redundancia, la respuesta es
+   multirregión; si solo pidiera alta disponibilidad, bastaría con varias zonas.
+R: Infraestructura global · Redundancia
+
+D: tecnologia
+P: Una empresa desarrolla una aplicación móvil que necesita una base de datos NoSQL de alto rendimiento. ¿Qué servicios podría utilizar? Selecciona dos.
+* Amazon DynamoDB
+* Amazon DocumentDB
+- Amazon Aurora
+- Amazon RDS
+- Amazon Redshift
+E: DynamoDB es NoSQL de clave-valor, totalmente gestionado y con latencia de milisegundos a
+   cualquier escala. DocumentDB es NoSQL orientado a documentos y compatible con MongoDB. Aurora y
+   RDS son relacionales y Redshift es un almacén de datos analítico, así que ninguno encaja en la
+   categoría NoSQL.
+R: Bases de datos NoSQL
+
+D: seguridad
+P: Una empresa migra una carga de trabajo a AWS. ¿Qué control sigue siendo responsabilidad de AWS después de la migración?
+* Mantener los controles físicos y de entorno del centro de datos
+- Aplicar parches al sistema operativo invitado
+- Aplicar parches a las aplicaciones propiedad del cliente
+- Identificar y proteger la información de identificación personal
+E: Migrar no transfiere a AWS la responsabilidad sobre tus datos ni tu software: AWS asume la
+   infraestructura física, la energía, la refrigeración y el control de acceso a sus instalaciones.
+   Clasificar y proteger los datos personales sigue siendo del cliente, porque solo él sabe qué
+   contienen.
+R: Modelo de responsabilidad compartida
+
+D: facturacion
+P: Una empresa quiere comparar el costo actual de su infraestructura en las instalaciones con el costo de ejecutarla en AWS. ¿Cómo debe hacer la comparación?
+* Con Migration Evaluator
+- Revisando el modelo de responsabilidad compartida
+- Analizando el marco de AWS Well-Architected
+- Auditando los costos de licencias de hardware y software existentes
+E: Migration Evaluator recopila datos reales de uso del entorno local y produce una estimación del
+   costo equivalente en AWS, con escenarios de migración. Es la herramienta diseñada para construir
+   el caso de negocio antes de migrar. Auditar licencias aporta una pieza del cálculo, pero no
+   produce la comparación completa.
+R: Migration Evaluator
+
+D: facturacion
+P: ¿Cuál es el plan de AWS Support más económico que incluye soporte técnico telefónico las 24 horas?
+* AWS Business Support
+- AWS Developer Support
+- AWS Basic Support
+- AWS Enterprise Support
+E: Los planes son Basic, Developer, Business, Enterprise On-Ramp y Enterprise. Basic solo da
+   documentación, foros y soporte de facturación. Developer agrega soporte técnico por correo en
+   horario laboral. Business es el primero con teléfono y chat 24/7 y el catálogo completo de
+   Trusted Advisor. Enterprise añade el administrador técnico de cuentas y respuesta en 15 minutos.
+R: Planes de soporte de AWS

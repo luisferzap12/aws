@@ -29,6 +29,8 @@ RAIZ = Path(__file__).resolve().parent
 MARCADOR = "/*__DATOS_BANCO__*/{}"
 MARCA_CABECERA = "<!--__CABECERA_PWA__-->"
 MARCA_SW = "<!--__REGISTRO_SW__-->"
+MARCA_VERSION = '/*__VERSION__*/"sin compilar"'
+MARCA_ANALITICA = "<!--__ANALITICA__-->"
 FORMATOS = {".svg", ".png", ".jpg", ".jpeg", ".webp", ".gif"}
 
 
@@ -127,7 +129,8 @@ def incrustar_imagenes(banco: dict, carpeta_imagenes: Path) -> tuple[dict, int]:
 
 
 def compilar(banco: dict, plantilla: Path, salida: Path,
-             cabecera: str = "", registro_sw: str = "") -> None:
+             cabecera: str = "", registro_sw: str = "", version: str = "",
+             analitica: str = "") -> None:
     html = plantilla.read_text(encoding="utf-8")
     if MARCADOR not in html:
         raise ErrorDeBanco(
@@ -139,6 +142,9 @@ def compilar(banco: dict, plantilla: Path, salida: Path,
     html = html.replace(MARCADOR, datos)
     html = html.replace(MARCA_CABECERA, cabecera)
     html = html.replace(MARCA_SW, registro_sw)
+    html = html.replace(MARCA_VERSION, json.dumps(
+        version or datetime.now().strftime("%Y%m%d%H%M")))
+    html = html.replace(MARCA_ANALITICA, analitica)
     salida.write_text(html, encoding="utf-8")
 
 
@@ -183,7 +189,8 @@ def generar_iconos(codigo: str, carpeta: Path) -> list[str]:
     return nombres
 
 
-def generar_pwa(banco: dict, plantilla: Path, carpeta: Path, version: str) -> None:
+def generar_pwa(banco: dict, plantilla: Path, carpeta: Path, version: str,
+                analitica: str = "") -> None:
     carpeta.mkdir(parents=True, exist_ok=True)
     codigo = banco.get("certificacion", "AWS")
     iconos = generar_iconos(codigo, carpeta)
@@ -243,7 +250,7 @@ self.addEventListener("fetch", (e) => {{
                 '}\n'
                 '</script>')
 
-    compilar(banco, plantilla, carpeta / "index.html", cabecera, registro)
+    compilar(banco, plantilla, carpeta / "index.html", cabecera, registro, version, analitica)
     (carpeta / ".nojekyll").write_text("", encoding="utf-8")
 
     total = sum(f.stat().st_size for f in carpeta.iterdir() if f.is_file())
@@ -285,6 +292,8 @@ def main() -> int:
     ap.add_argument("--imagenes", default="imagenes")
     ap.add_argument("--salida", default="repaso_aws.html")
     ap.add_argument("--solo-validar", action="store_true")
+    ap.add_argument("--analitica", metavar="ARCHIVO",
+                    help="archivo HTML con el fragmento de tu proveedor de analítica")
     ap.add_argument("--pwa", metavar="CARPETA",
                     help="genera un sitio instalable (index.html, manifest.json, sw.js, íconos)")
     ap.add_argument("--servir", action="store_true")
@@ -333,17 +342,26 @@ def main() -> int:
 
     banco, incrustadas = incrustar_imagenes(banco, carpeta_imagenes)
 
+    analitica = ""
+    if args.analitica:
+        ruta_an = RAIZ / args.analitica
+        if not ruta_an.is_file():
+            print(f"No encuentro el archivo de analitica: {ruta_an}", file=sys.stderr)
+            return 1
+        analitica = ruta_an.read_text(encoding="utf-8").strip()
+        print(f"Analitica incluida desde {ruta_an.name}.")
+
     if args.pwa:
         carpeta = RAIZ / args.pwa
         version = datetime.now().strftime("%Y%m%d%H%M")
-        generar_pwa(banco, RAIZ / args.plantilla, carpeta, version)
+        generar_pwa(banco, RAIZ / args.plantilla, carpeta, version, analitica)
         print(f"{incrustadas} diagramas incrustados. Sube el contenido de "
               f"{carpeta.name}/ a la rama de GitHub Pages.")
         if args.servir:
             servir(carpeta, "index.html", args.puerto)
         return 0
 
-    compilar(banco, RAIZ / args.plantilla, salida)
+    compilar(banco, RAIZ / args.plantilla, salida, "", "", "", analitica)
     peso_kb = salida.stat().st_size / 1024
     print(f"\nGenerado {salida.name} ({peso_kb:.0f} KB, {incrustadas} diagramas incrustados).")
 
